@@ -1,55 +1,41 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'org.springframework.boot' version '2.5.1'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'org.liquibase.gradle' version '2.0.3'
-    id 'nu.studer.jooq' version '5.2.2'
+    id 'org.jooq.jooq-codegen-gradle' version '3.21.6'
 }
 
-bootJar.enabled(false)
-jar.enabled(true)
-jar.archiveClassifier.set('')
-
-group 'io.dsub.opendiscogs'
-version findProperty('releaseVersion') ?: '0.0.4'
-
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+group = 'io.dsub.opendiscogs'
+def currentReleaseVersion = file('version.txt').getText('UTF-8').trim()
+version = findProperty('releaseVersion') ?: "${currentReleaseVersion}-SNAPSHOT"
 
 java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
     withSourcesJar()
     withJavadocJar()
 }
 
 repositories {
     mavenCentral()
-    maven { url "https://plugins.gradle.org/m2/" }
 }
 
 dependencies {
-    jooqGenerator (
-            'org.slf4j:slf4j-simple:1.7.9',
-            'org.postgresql:postgresql',
-            'org.testcontainers:postgresql:1.21.4',
-    )
-    api(
-            'org.jooq:jooq',
-    )
-    liquibaseRuntime (
-            'org.liquibase:liquibase-core:3.8.1',
-            'org.liquibase:liquibase-groovy-dsl:2.1.1',
-            'javax.xml.bind:jaxb-api:2.3.1',
-            'org.postgresql:postgresql',
-            'org.yaml:snakeyaml:1.15'
+    api 'org.jooq:jooq:3.21.6'
+
+    jooqCodegen(
+            'org.slf4j:slf4j-simple:2.0.18',
+            'org.postgresql:postgresql:42.7.13',
+            'org.testcontainers:testcontainers-jdbc:2.0.5',
+            'org.testcontainers:testcontainers-postgresql:2.0.5'
     )
 }
 
 publishing {
     repositories {
         maven {
-            name = "centralStaging"
-            url = layout.buildDirectory.dir("central-staging")
+            name = 'centralStaging'
+            url = layout.buildDirectory.dir('central-staging')
         }
     }
     publications {
@@ -81,7 +67,7 @@ publishing {
                 developers {
                     developer {
                         id = 'state303'
-                        name = 'Seunghyun Bae'
+                        name = 'state303'
                         email = 'state303@linux.com'
                         organization = 'DSUB'
                         organizationUrl = 'https://www.dsub.io'
@@ -91,9 +77,12 @@ publishing {
 
                 scm {
                     connection = 'scm:git:https://github.com/dsub-io/open-discogs-jooq.git'
-                    developerConnection = 'scm:git:ssh://git@github.com/dsub-io/open-discogs-jooq.git'
+                    developerConnection =
+                            'scm:git:ssh://git@github.com/dsub-io/open-discogs-jooq.git'
                     url = 'https://github.com/dsub-io/open-discogs-jooq'
-                    tag = "v${project.version}"
+                    tag = project.version.toString().endsWith('-SNAPSHOT')
+                            ? 'HEAD'
+                            : "v${project.version}"
                 }
 
                 issueManagement {
@@ -105,59 +94,123 @@ publishing {
     }
 }
 
-// jooq
 jooq {
-    configurations {
-        main {
-            generationTool {
-                logging = org.jooq.meta.jaxb.Logging.WARN
-                jdbc {
-                    driver = "org.testcontainers.jdbc.ContainerDatabaseDriver"
-                    url = "jdbc:tc:postgresql:///databasename?TC_INITSCRIPT=file:${projectDir}/src/main/resources/postgresql-init.sql"
-                }
-                generator {
-                    name = 'org.jooq.codegen.JavaGenerator'
-                    database {
-                        inputSchema = 'public'
-                    }
-                    generate {
-                        deprecated = false
-                        records = true
-                        immutablePojos = false
-                        fluentSetters = true
-                        javaTimeTypes = true
-                    }
-                    target {
-                        packageName = 'io.dsub.opendiscogs.jooq'
-                        directory = "build/generated/main"  // default (can be omitted)
-                    }
-                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
-                }
+    configuration {
+        logging = org.jooq.meta.jaxb.Logging.WARN
+        jdbc {
+            driver = 'org.testcontainers.jdbc.ContainerDatabaseDriver'
+            url =
+                    "jdbc:tc:postgresql:18.4-alpine:///databasename" +
+                            "?TC_INITSCRIPT=file:${projectDir}" +
+                            '/src/main/resources/postgresql-init.sql'
+        }
+        generator {
+            name = 'org.jooq.codegen.JavaGenerator'
+            database {
+                inputSchema = 'public'
+            }
+            generate {
+                deprecated = false
+                records = true
+                immutablePojos = false
+                fluentSetters = true
+                javaTimeTypes = true
+                implicitJoinPathsToMany = false
+                implicitJoinPathsManyToMany = false
+            }
+            target {
+                packageName = 'io.dsub.opendiscogs.jooq'
+                directory = 'build/generated-sources/jooq/main'
+            }
+            strategy {
+                name = 'org.jooq.codegen.DefaultGeneratorStrategy'
             }
         }
     }
 }
 
-liquibase {
-    activities {
-        configure {
-            main {
-                changeLogFile 'src/main/resources/db/changelog/db.changelog-master.yaml'
-                url System.getenv('POSTGRES_URL')
-                username System.getenv('POSTGRES_USER')
-                password System.getenv('POSTGRES_PASSWORD')
-                changeSetAuthor System.getenv('AUTHOR')
-            }
+tasks.named('compileJava') {
+    dependsOn(tasks.named('jooqCodegen'))
+}
+
+tasks.named('javadoc') {
+    dependsOn(tasks.named('jooqCodegen'))
+}
+
+tasks.named('sourcesJar') {
+    dependsOn(tasks.named('jooqCodegen'))
+}
+
+tasks.named('jooqCodegen') {
+    inputs.file('src/main/resources/postgresql-init.sql')
+}
+
+def generatedSchemaDirectory =
+        layout.buildDirectory.dir('generated-sources/jooq/main')
+
+tasks.register('validateGeneratedSchema') {
+    description = 'Checks the generated library contains the core OpenDiscogs schema.'
+    group = 'verification'
+    dependsOn(tasks.named('jooqCodegen'))
+    inputs.dir(generatedSchemaDirectory)
+    doLast {
+        def expectedSources = [
+                'io/dsub/opendiscogs/jooq/Tables.java',
+                'io/dsub/opendiscogs/jooq/tables/Artist.java',
+                'io/dsub/opendiscogs/jooq/tables/Label.java',
+                'io/dsub/opendiscogs/jooq/tables/Master.java',
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItem.java',
+                'io/dsub/opendiscogs/jooq/tables/records/ArtistRecord.java',
+                'io/dsub/opendiscogs/jooq/tables/records/LabelRecord.java',
+                'io/dsub/opendiscogs/jooq/tables/records/MasterRecord.java',
+                'io/dsub/opendiscogs/jooq/tables/records/ReleaseItemRecord.java'
+        ]
+        def generatedDirectory = generatedSchemaDirectory.get()
+        def missingSources = expectedSources.findAll {
+            !generatedDirectory.file(it).asFile.isFile()
+        }
+        if (!missingSources.isEmpty()) {
+            throw new GradleException(
+                    "Generated schema is missing required sources:\n - "
+                            + missingSources.join('\n - '))
         }
     }
 }
 
-tasks.named('generateJooq').configure {
-    // make jOOQ task participate in incremental builds (which is also a prerequisite for participating in build caching)
-    allInputsDeclared = true
+def publicationPom = layout.buildDirectory.file('publications/mavenJava/pom-default.xml')
 
-    // make jOOQ task participate in build caching
-    outputs.cacheIf { true }
+tasks.register('validatePublicationPom') {
+    description = 'Checks Maven Central coordinates and public metadata.'
+    group = 'verification'
+    dependsOn(tasks.named('generatePomFileForMavenJavaPublication'))
+    inputs.file(publicationPom)
+    doLast {
+        def pomText = publicationPom.get().asFile.getText('UTF-8')
+        def requiredFragments = [
+                '<groupId>io.dsub.opendiscogs</groupId>',
+                '<artifactId>open-discogs-jooq</artifactId>',
+                '<name>state303</name>',
+                '<groupId>org.jooq</groupId>',
+                '<artifactId>jooq</artifactId>',
+                '<version>3.21.6</version>'
+        ]
+        def missingFragments = requiredFragments.findAll {
+            !pomText.contains(it)
+        }
+        if (!missingFragments.isEmpty()) {
+            throw new GradleException(
+                    "Publication POM is missing required metadata:\n - "
+                            + missingFragments.join('\n - '))
+        }
+    }
+}
+
+check.dependsOn(tasks.named('validateGeneratedSchema'))
+check.dependsOn(tasks.named('validatePublicationPom'))
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+    options.compilerArgs += ['-Xlint:deprecation', '-Xlint:removal', '-Werror']
 }
 
 tasks.withType(Javadoc).configureEach {
