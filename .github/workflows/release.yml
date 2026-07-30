@@ -67,7 +67,6 @@ jobs:
         shell: bash
         env:
           EXPECTED_BASE_BRANCH: ${{ fromJSON(needs.release-please.outputs.pr).baseBranchName }}
-          EXPECTED_HEAD_SHA: ${{ fromJSON(needs.release-please.outputs.pr).sha }}
           RELEASE_PR_BRANCH: ${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}
         run: |
           set -euo pipefail
@@ -79,7 +78,10 @@ jobs:
             echo "::error::Unexpected Release Please branch."
             exit 1
           fi
-          if [[ "$(git rev-parse HEAD)" != "$EXPECTED_HEAD_SHA" ]]; then
+          expected_head_sha="$(
+            git rev-parse "refs/remotes/origin/$RELEASE_PR_BRANCH"
+          )"
+          if [[ "$(git rev-parse HEAD)" != "$expected_head_sha" ]]; then
             echo "::error::Checked-out commit does not match Release Please output."
             exit 1
           fi
@@ -99,7 +101,7 @@ jobs:
           git commit --amend --no-edit --gpg-sign="$signing_key"
           git verify-commit HEAD
           git push \
-            --force-with-lease="refs/heads/$RELEASE_PR_BRANCH:$EXPECTED_HEAD_SHA" \
+            --force-with-lease="refs/heads/$RELEASE_PR_BRANCH:$expected_head_sha" \
             origin \
             "HEAD:refs/heads/$RELEASE_PR_BRANCH"
 
