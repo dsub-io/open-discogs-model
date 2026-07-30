@@ -1,9 +1,11 @@
-# discogs-jooq
-[![Build Status](https://app.travis-ci.com/state303/discogs-jooq.svg?branch=main)](https://app.travis-ci.com/state303/discogs-jooq)
+# OpenDiscogs jOOQ
 
-jOOQ-generated schema classes shared by Discogs data services.
+jOOQ-generated schema classes shared by DSUB OpenDiscogs data services.
 
-[discogs-batch](https://github.com/state303/discogs-batch)
+This is an independent DSUB project. It is not affiliated with or endorsed by
+Discogs.
+
+[discogs-batch](https://github.com/echovisionlab/discogs-batch)
 
 ## Dependency
 
@@ -15,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.dsub.discogs:discogs-jooq:0.0.4'
+    implementation 'io.dsub.opendiscogs:open-discogs-jooq:0.0.4'
 }
 ```
 

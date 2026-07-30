@@ -11,8 +11,8 @@ bootJar.enabled(false)
 jar.enabled(true)
 jar.archiveClassifier.set('')
 
-group 'io.dsub.discogs'
-version '0.0.4'
+group 'io.dsub.opendiscogs'
+version findProperty('releaseVersion') ?: '0.0.4'
 
 sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_16
@@ -54,7 +54,7 @@ publishing {
     }
     publications {
         mavenJava(MavenPublication) {
-            artifactId = 'discogs-jooq'
+            artifactId = 'open-discogs-jooq'
             from components.java
             versionMapping {
                 usage('java-api') {
@@ -65,9 +65,9 @@ publishing {
                 }
             }
             pom {
-                name = 'discogs-jooq'
-                description = 'Generated jOOQ schema classes for Discogs data services.'
-                url = 'https://github.com/state303/discogs-jooq'
+                name = 'DSUB OpenDiscogs jOOQ'
+                description = 'jOOQ-generated schema classes for DSUB OpenDiscogs data services.'
+                url = 'https://github.com/state303/open-discogs-jooq'
                 inceptionYear = '2021'
 
                 licenses {
@@ -90,15 +90,15 @@ publishing {
                 }
 
                 scm {
-                    connection = 'scm:git:https://github.com/state303/discogs-jooq.git'
-                    developerConnection = 'scm:git:ssh://git@github.com/state303/discogs-jooq.git'
-                    url = 'https://github.com/state303/discogs-jooq'
-                    tag = 'v0.0.4'
+                    connection = 'scm:git:https://github.com/state303/open-discogs-jooq.git'
+                    developerConnection = 'scm:git:ssh://git@github.com/state303/open-discogs-jooq.git'
+                    url = 'https://github.com/state303/open-discogs-jooq'
+                    tag = "v${project.version}"
                 }
 
                 issueManagement {
                     system = 'GitHub'
-                    url = 'https://github.com/state303/discogs-jooq/issues'
+                    url = 'https://github.com/state303/open-discogs-jooq/issues'
                 }
             }
         }
@@ -128,7 +128,7 @@ jooq {
                         javaTimeTypes = true
                     }
                     target {
-                        packageName = 'io.dsub.discogs.jooq'
+                        packageName = 'io.dsub.opendiscogs.jooq'
                         directory = "build/generated/main"  // default (can be omitted)
                     }
                     strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
