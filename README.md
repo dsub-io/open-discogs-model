@@ -5,7 +5,7 @@ jOOQ-generated schema classes shared by DSUB OpenDiscogs data services.
 This is an independent DSUB project. It is not affiliated with or endorsed by
 Discogs.
 
-[discogs-batch](https://github.com/echovisionlab/discogs-batch)
+[OpenDiscogs Batch](https://github.com/dsub-io/open-discogs-batch)
 
 ## Dependency
 
