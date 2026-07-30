@@ -1,7 +1,0 @@
-language: java
-jdk:
-  - openjdk16
-before_script:
-  - chmod +x gradlew
-script:
-  - ./gradlew build
