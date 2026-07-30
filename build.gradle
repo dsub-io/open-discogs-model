@@ -67,7 +67,7 @@ publishing {
             pom {
                 name = 'DSUB OpenDiscogs jOOQ'
                 description = 'jOOQ-generated schema classes for DSUB OpenDiscogs data services.'
-                url = 'https://github.com/state303/open-discogs-jooq'
+                url = 'https://github.com/dsub-io/open-discogs-jooq'
                 inceptionYear = '2021'
 
                 licenses {
@@ -90,15 +90,15 @@ publishing {
                 }
 
                 scm {
-                    connection = 'scm:git:https://github.com/state303/open-discogs-jooq.git'
-                    developerConnection = 'scm:git:ssh://git@github.com/state303/open-discogs-jooq.git'
-                    url = 'https://github.com/state303/open-discogs-jooq'
+                    connection = 'scm:git:https://github.com/dsub-io/open-discogs-jooq.git'
+                    developerConnection = 'scm:git:ssh://git@github.com/dsub-io/open-discogs-jooq.git'
+                    url = 'https://github.com/dsub-io/open-discogs-jooq'
                     tag = "v${project.version}"
                 }
 
                 issueManagement {
                     system = 'GitHub'
-                    url = 'https://github.com/state303/open-discogs-jooq/issues'
+                    url = 'https://github.com/dsub-io/open-discogs-jooq/issues'
                 }
             }
         }
