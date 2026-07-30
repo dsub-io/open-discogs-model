@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.dsub.opendiscogs:open-discogs-jooq:0.0.4'
+    implementation 'io.dsub.opendiscogs:open-discogs-jooq:0.0.5'
 }
 ```
 <!-- x-release-please-end -->
