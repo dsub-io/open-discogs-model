@@ -53,7 +53,7 @@
   ],
   "packages": {
     ".": {
-      "package-name": "open-discogs-jooq",
+      "package-name": "open-discogs-model",
       "extra-files": [
         {
           "type": "generic",
