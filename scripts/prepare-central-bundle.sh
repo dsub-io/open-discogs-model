@@ -4,7 +4,7 @@ set -euo pipefail
 
 version="${1:?usage: prepare-central-bundle.sh VERSION}"
 group_id="io.dsub.opendiscogs"
-artifact_id="open-discogs-jooq"
+artifact_id="open-discogs-model-jooq"
 group_path="${group_id//.//}"
 staging_dir="build/central-staging/$group_path/$artifact_id/$version"
 bundle_root="$(mktemp -d "build/central-bundle.XXXXXX")"

@@ -38,6 +38,7 @@ jobs:
           set -euo pipefail
 
           pattern='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9._/-]+\))?(!)?: .+'
+          branch_pattern='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)/[a-z0-9._/-]+$'
 
           validate_subject() {
             local label="$1"
@@ -55,6 +56,12 @@ jobs:
             normalized_head_ref="${PR_HEAD_REF,,}"
             if [[ "$normalized_head_ref" =~ ^(agent|codex|claude)(/|$) ]]; then
               echo "::error::Forbidden pull request branch name: $PR_HEAD_REF"
+              failed=1
+            fi
+            if [[ ! "$normalized_head_ref" =~ $branch_pattern ]] &&
+              [[ ! "$normalized_head_ref" =~ ^dependabot/ ]] &&
+              [[ ! "$normalized_head_ref" =~ ^release-please-- ]]; then
+              echo "::error::Pull request branch is not Conventional: $PR_HEAD_REF"
               failed=1
             fi
             range="$PR_BASE_SHA..$PR_HEAD_SHA"

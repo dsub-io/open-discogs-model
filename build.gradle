@@ -7,6 +7,7 @@ plugins {
 group = 'io.dsub.opendiscogs'
 def currentReleaseVersion = file('version.txt').getText('UTF-8').trim()
 version = findProperty('releaseVersion') ?: "${currentReleaseVersion}-SNAPSHOT"
+def modelArtifactId = 'open-discogs-model-jooq'
 
 java {
     toolchain {
@@ -20,8 +21,19 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDir 'schema'
+            include 'contracts/**', 'migrations/**'
+        }
+    }
+}
+
 dependencies {
     api 'org.jooq:jooq:3.21.6'
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.1.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.1.2'
 
     jooqCodegen(
             'org.slf4j:slf4j-simple:2.0.18',
@@ -29,6 +41,10 @@ dependencies {
             'org.testcontainers:testcontainers-jdbc:2.0.5',
             'org.testcontainers:testcontainers-postgresql:2.0.5'
     )
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
 
 publishing {
@@ -40,7 +56,7 @@ publishing {
     }
     publications {
         mavenJava(MavenPublication) {
-            artifactId = 'open-discogs-jooq'
+            artifactId = modelArtifactId
             from components.java
             versionMapping {
                 usage('java-api') {
@@ -51,9 +67,10 @@ publishing {
                 }
             }
             pom {
-                name = 'DSUB OpenDiscogs jOOQ'
-                description = 'jOOQ-generated schema classes for DSUB OpenDiscogs data services.'
-                url = 'https://github.com/dsub-io/open-discogs-jooq'
+                name = 'DSUB OpenDiscogs Model for jOOQ'
+                description =
+                        'jOOQ-generated Java models and canonical PostgreSQL migrations for DSUB OpenDiscogs.'
+                url = 'https://github.com/dsub-io/open-discogs-model'
                 inceptionYear = '2021'
 
                 licenses {
@@ -76,10 +93,10 @@ publishing {
                 }
 
                 scm {
-                    connection = 'scm:git:https://github.com/dsub-io/open-discogs-jooq.git'
+                    connection = 'scm:git:https://github.com/dsub-io/open-discogs-model.git'
                     developerConnection =
-                            'scm:git:ssh://git@github.com/dsub-io/open-discogs-jooq.git'
-                    url = 'https://github.com/dsub-io/open-discogs-jooq'
+                            'scm:git:ssh://git@github.com/dsub-io/open-discogs-model.git'
+                    url = 'https://github.com/dsub-io/open-discogs-model'
                     tag = project.version.toString().endsWith('-SNAPSHOT')
                             ? 'HEAD'
                             : "v${project.version}"
@@ -87,10 +104,40 @@ publishing {
 
                 issueManagement {
                     system = 'GitHub'
-                    url = 'https://github.com/dsub-io/open-discogs-jooq/issues'
+                    url = 'https://github.com/dsub-io/open-discogs-model/issues'
                 }
             }
         }
+    }
+}
+
+def migrationFiles = fileTree('schema/migrations') {
+    include '*.sql'
+}.files.sort { left, right -> left.name <=> right.name }
+def combinedSchema = layout.buildDirectory.file('generated-schema/postgresql-init.sql')
+
+tasks.register('prepareSchema') {
+    description = 'Combines ordered PostgreSQL migrations for schema code generation.'
+    group = 'build setup'
+    inputs.files(migrationFiles)
+    outputs.file(combinedSchema)
+    doLast {
+        def output = combinedSchema.get().asFile
+        output.parentFile.mkdirs()
+        output.withWriter('UTF-8') { writer ->
+            migrationFiles.each { migration ->
+                writer.write("-- ${migration.name}\n")
+                writer.write(migration.getText('UTF-8'))
+                writer.write('\n')
+            }
+        }
+    }
+}
+
+tasks.named('processResources') {
+    dependsOn(tasks.named('prepareSchema'))
+    from(combinedSchema) {
+        rename { 'postgresql-init.sql' }
     }
 }
 
@@ -102,7 +149,7 @@ jooq {
             url =
                     "jdbc:tc:postgresql:18.4-alpine:///databasename" +
                             "?TC_INITSCRIPT=file:${projectDir}" +
-                            '/src/main/resources/postgresql-init.sql'
+                            '/build/generated-schema/postgresql-init.sql'
         }
         generator {
             name = 'org.jooq.codegen.JavaGenerator'
@@ -142,7 +189,8 @@ tasks.named('sourcesJar') {
 }
 
 tasks.named('jooqCodegen') {
-    inputs.file('src/main/resources/postgresql-init.sql')
+    dependsOn(tasks.named('prepareSchema'))
+    inputs.files(migrationFiles)
 }
 
 def generatedSchemaDirectory =
@@ -157,10 +205,18 @@ tasks.register('validateGeneratedSchema') {
         def expectedSources = [
                 'io/dsub/opendiscogs/jooq/Tables.java',
                 'io/dsub/opendiscogs/jooq/tables/Artist.java',
+                'io/dsub/opendiscogs/jooq/tables/DiscogsDump.java',
+                'io/dsub/opendiscogs/jooq/tables/DiscogsImportCheckpoint.java',
+                'io/dsub/opendiscogs/jooq/tables/DiscogsImportRun.java',
+                'io/dsub/opendiscogs/jooq/tables/DiscogsImportRunDump.java',
                 'io/dsub/opendiscogs/jooq/tables/Label.java',
                 'io/dsub/opendiscogs/jooq/tables/Master.java',
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItem.java',
                 'io/dsub/opendiscogs/jooq/tables/records/ArtistRecord.java',
+                'io/dsub/opendiscogs/jooq/tables/records/DiscogsDumpRecord.java',
+                'io/dsub/opendiscogs/jooq/tables/records/DiscogsImportCheckpointRecord.java',
+                'io/dsub/opendiscogs/jooq/tables/records/DiscogsImportRunRecord.java',
+                'io/dsub/opendiscogs/jooq/tables/records/DiscogsImportRunDumpRecord.java',
                 'io/dsub/opendiscogs/jooq/tables/records/LabelRecord.java',
                 'io/dsub/opendiscogs/jooq/tables/records/MasterRecord.java',
                 'io/dsub/opendiscogs/jooq/tables/records/ReleaseItemRecord.java'
@@ -188,7 +244,7 @@ tasks.register('validatePublicationPom') {
         def pomText = publicationPom.get().asFile.getText('UTF-8')
         def requiredFragments = [
                 '<groupId>io.dsub.opendiscogs</groupId>',
-                '<artifactId>open-discogs-jooq</artifactId>',
+                '<artifactId>open-discogs-model-jooq</artifactId>',
                 '<name>state303</name>',
                 '<groupId>org.jooq</groupId>',
                 '<artifactId>jooq</artifactId>',
@@ -207,6 +263,31 @@ tasks.register('validatePublicationPom') {
 
 check.dependsOn(tasks.named('validateGeneratedSchema'))
 check.dependsOn(tasks.named('validatePublicationPom'))
+
+tasks.register('validateSchemaResources') {
+    description = 'Checks the Java artifact ships every canonical schema migration.'
+    group = 'verification'
+    dependsOn(tasks.named('processResources'))
+    inputs.files(migrationFiles)
+    doLast {
+        def missingMigrations = migrationFiles.findAll {
+            !layout.buildDirectory.file("resources/main/migrations/${it.name}")
+                    .get().asFile.isFile()
+        }
+        if (!layout.buildDirectory.file('resources/main/postgresql-init.sql')
+                .get().asFile.isFile()) {
+            throw new GradleException(
+                    'Java resources are missing the generated postgresql-init.sql')
+        }
+        if (!missingMigrations.isEmpty()) {
+            throw new GradleException(
+                    "Java resources are missing schema migrations:\n - "
+                            + missingMigrations*.name.join('\n - '))
+        }
+    }
+}
+
+check.dependsOn(tasks.named('validateSchemaResources'))
 
 tasks.withType(JavaCompile).configureEach {
     options.release = 21

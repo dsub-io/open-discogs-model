@@ -1,0 +1,7 @@
+# open-discogs-manifest/v1
+# expected_sha256<TAB>fingerprint
+expected_sha256	0da2bfd15f97ec96094a2554c8ea0f6a01a866ba0af5dc622c99188565058f05
+artist	2026-07-01	aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+label	2026-07-01	bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+master	2026-07-01	cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+release	2026-07-01	dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd

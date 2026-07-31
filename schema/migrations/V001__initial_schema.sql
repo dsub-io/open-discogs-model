@@ -458,4 +458,3 @@ create table if not exists public.artist_member
     constraint uq_artist_member_artist_id_member_id
         unique (artist_id, member_id)
 );
-

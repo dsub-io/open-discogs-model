@@ -1,6 +1,21 @@
 version: 2
 
 updates:
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '02:45'
+      timezone: Asia/Seoul
+    groups:
+      go-dependencies:
+        patterns:
+          - '*'
+    commit-message:
+      prefix: build
+      include: scope
+
   - package-ecosystem: gradle
     directory: /
     schedule:

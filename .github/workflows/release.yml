@@ -165,6 +165,11 @@ jobs:
           done
           exit "$missing"
 
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
       - uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
         with:
           java-version: '21'
@@ -182,6 +187,12 @@ jobs:
           install -d -m 700 "$GNUPGHOME"
           printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
           echo "GNUPGHOME=$GNUPGHOME" >> "$GITHUB_ENV"
+
+      - name: Verify Go module
+        run: |
+          set -euo pipefail
+          scripts/verify-generated-models.sh
+          go test ./...
 
       - name: Build Maven Central artifacts
         shell: bash
@@ -215,4 +226,13 @@ jobs:
           set -euo pipefail
           scripts/publish-central-bundle.sh \
             "${{ steps.bundle.outputs.path }}" \
-            "io.dsub.opendiscogs:open-discogs-jooq:$RELEASE_VERSION"
+            "io.dsub.opendiscogs:open-discogs-model-jooq:$RELEASE_VERSION"
+
+      - name: Verify tagged Go module
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ needs.release-please.outputs.tag-name }}
+        run: |
+          set -euo pipefail
+          GOPROXY=direct go list -m \
+            "github.com/dsub-io/open-discogs-model@$RELEASE_TAG"
