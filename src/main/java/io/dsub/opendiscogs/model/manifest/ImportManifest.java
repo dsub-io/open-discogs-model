@@ -55,7 +55,6 @@ public final class ImportManifest {
 
     List<Dump> normalized = new ArrayList<>(dumps.size());
     Set<String> seen = new HashSet<>();
-    LocalDate commonDate = null;
     for (Dump dump : dumps) {
       if (dump == null || dump.entityType() == null || dump.dumpDate() == null
           || dump.checksumSha256() == null) {
@@ -67,11 +66,6 @@ public final class ImportManifest {
       }
       if (!seen.add(entityType)) {
         throw new IllegalArgumentException("duplicate entity type " + entityType);
-      }
-      if (commonDate == null) {
-        commonDate = dump.dumpDate();
-      } else if (!commonDate.equals(dump.dumpDate())) {
-        throw new IllegalArgumentException("all dumps must use the same dump date");
       }
       if (!CHECKSUM_PATTERN.matcher(dump.checksumSha256()).matches()) {
         throw new IllegalArgumentException("invalid SHA-256 for " + entityType);

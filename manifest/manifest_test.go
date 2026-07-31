@@ -64,14 +64,6 @@ func TestCanonicalRejectsAmbiguousManifests(t *testing.T) {
 	tests := map[string][]Dump{
 		"empty":          nil,
 		"duplicate type": {valid, valid},
-		"mixed dates": {
-			valid,
-			{
-				EntityType:     "label",
-				DumpDate:       date.AddDate(0, 0, 1),
-				ChecksumSHA256: strings.Repeat("b", 64),
-			},
-		},
 		"invalid checksum": {{
 			EntityType:     "artist",
 			DumpDate:       date,
@@ -91,5 +83,32 @@ func TestCanonicalRejectsAmbiguousManifests(t *testing.T) {
 				t.Fatal("Canonical() error = nil")
 			}
 		})
+	}
+}
+
+func TestCanonicalAllowsIndependentEntityDates(t *testing.T) {
+	t.Parallel()
+
+	canonical, err := Canonical([]Dump{
+		{
+			EntityType:     "release",
+			DumpDate:       time.Date(2026, time.July, 2, 0, 0, 0, 0, time.UTC),
+			ChecksumSHA256: strings.Repeat("b", 64),
+		},
+		{
+			EntityType:     "artist",
+			DumpDate:       time.Date(2026, time.July, 1, 0, 0, 0, 0, time.UTC),
+			ChecksumSHA256: strings.Repeat("a", 64),
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := "open-discogs-manifest/v1\n" +
+		"artist\x002026-07-01\x00" + strings.Repeat("a", 64) + "\n" +
+		"release\x002026-07-02\x00" + strings.Repeat("b", 64) + "\n"
+	if string(canonical) != want {
+		t.Fatalf("Canonical() = %q, want %q", string(canonical), want)
 	}
 }
