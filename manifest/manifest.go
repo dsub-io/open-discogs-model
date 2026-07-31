@@ -48,7 +48,6 @@ func Canonical(dumps []Dump) ([]byte, error) {
 
 	normalized := make([]Dump, len(dumps))
 	seen := make(map[string]struct{}, len(dumps))
-	var dumpDate string
 	for index, dump := range dumps {
 		entityType := strings.ToLower(dump.EntityType)
 		if _, known := knownEntityTypes[entityType]; !known {
@@ -59,16 +58,9 @@ func Canonical(dumps []Dump) ([]byte, error) {
 		}
 		seen[entityType] = struct{}{}
 
-		date := dump.DumpDate.Format("2006-01-02")
 		if dump.DumpDate.IsZero() {
 			return nil, fmt.Errorf("dump date is required for %q", entityType)
 		}
-		if dumpDate == "" {
-			dumpDate = date
-		} else if dumpDate != date {
-			return nil, errors.New("all dumps must use the same dump date")
-		}
-
 		if !checksumPattern.MatchString(dump.ChecksumSHA256) {
 			return nil, fmt.Errorf("invalid SHA-256 for %q", entityType)
 		}

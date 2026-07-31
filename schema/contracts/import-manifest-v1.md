@@ -4,8 +4,9 @@ An import is identified by the bytes of the selected dumps, not by their
 download location.
 
 The manifest contains one entry per selected entity type. Entity types are
-limited to `artist`, `label`, `master`, and `release`, may appear only once, and
-must all use the same dump date. A normal full import requires all four types.
+limited to `artist`, `label`, `master`, and `release`, and may appear only once.
+Every entry carries its own dump date, so an entity absent from one publication
+can use a different dated dump. A normal full import requires all four types.
 A deliberately scoped import may contain a dependency-complete subset.
 
 To compute `manifest_sha256`:

@@ -56,15 +56,26 @@ class ImportManifestTest {
   }
 
   @Test
-  void rejectsMixedDates() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            ImportManifest.fingerprint(
+  void allowsIndependentEntityDates() {
+    String canonical =
+        new String(
+            ImportManifest.canonical(
                 List.of(
                     new ImportManifest.Dump(
-                        "artist", LocalDate.of(2026, 7, 1), "a".repeat(64)),
+                        "release", LocalDate.of(2026, 7, 2), "b".repeat(64)),
                     new ImportManifest.Dump(
-                        "label", LocalDate.of(2026, 7, 2), "b".repeat(64)))));
+                        "artist", LocalDate.of(2026, 7, 1), "a".repeat(64)))),
+            StandardCharsets.UTF_8);
+
+    assertEquals(
+        "open-discogs-manifest/v1\n"
+            + "artist\0"
+            + "2026-07-01\0"
+            + "a".repeat(64)
+            + "\nrelease\0"
+            + "2026-07-02\0"
+            + "b".repeat(64)
+            + "\n",
+        canonical);
   }
 }
