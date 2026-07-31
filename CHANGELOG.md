@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/dsub-io/open-discogs-model/compare/v0.1.0...v0.1.1) (2026-07-31)
+
+
+### Bug Fixes
+
+* allow reissued dump paths ([7c5eec2](https://github.com/dsub-io/open-discogs-model/commit/7c5eec210f9e2cf543684da79fbddc01b79625bc))
+
 ## [0.1.0](https://github.com/dsub-io/open-discogs-model/compare/v0.0.5...v0.1.0) (2026-07-31)
 
 
