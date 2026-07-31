@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/dsub-io/open-discogs-model/compare/v0.1.1...v0.1.2) (2026-07-31)
+
+
+### Bug Fixes
+
+* allow independent entity dump dates ([2eea8d0](https://github.com/dsub-io/open-discogs-model/commit/2eea8d055328ea1fd25bae753df64abb6d606600))
+
 ## [0.1.1](https://github.com/dsub-io/open-discogs-model/compare/v0.1.0...v0.1.1) (2026-07-31)
 
 
