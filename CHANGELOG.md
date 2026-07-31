@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.0](https://github.com/dsub-io/open-discogs-model/compare/v0.0.5...v0.1.0) (2026-07-31)
+
+
+### Features
+
+* publish shared Java and Go models ([3c3332d](https://github.com/dsub-io/open-discogs-model/commit/3c3332db8ace2a34bb8d89e554ade421793a1b84))
+
 ## [0.0.5](https://github.com/dsub-io/open-discogs-model/compare/v0.0.4...v0.0.5) (2026-07-30)
 
 
