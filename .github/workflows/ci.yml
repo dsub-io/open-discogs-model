@@ -28,6 +28,18 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
+      - name: Verify release policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq empty release-please-config.json
+          for type in build chore ci docs refactor style test; do
+            jq -e \
+              --arg type "$type" \
+              'any(.["changelog-sections"][]; .type == $type and .hidden == true)' \
+              release-please-config.json >/dev/null
+          done
+
       - name: Verify generated Go models
         run: scripts/verify-generated-models.sh
 
