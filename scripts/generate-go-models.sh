@@ -22,7 +22,12 @@ docker run \
   postgres:18.4-alpine >/dev/null
 
 for attempt in {1..30}; do
-  if docker exec "$container_name" pg_isready --username modelgen --dbname modelgen >/dev/null 2>&1; then
+  if docker exec "$container_name" \
+    psql \
+    --username modelgen \
+    --dbname modelgen \
+    --tuples-only \
+    --command 'select 1' >/dev/null 2>&1; then
     break
   fi
   if [[ "$attempt" == 30 ]]; then

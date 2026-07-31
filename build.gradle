@@ -25,13 +25,15 @@ sourceSets {
     main {
         resources {
             srcDir 'schema'
-            include 'migrations/**'
+            include 'contracts/**', 'migrations/**'
         }
     }
 }
 
 dependencies {
     api 'org.jooq:jooq:3.21.6'
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.1.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.1.2'
 
     jooqCodegen(
             'org.slf4j:slf4j-simple:2.0.18',
@@ -39,6 +41,10 @@ dependencies {
             'org.testcontainers:testcontainers-jdbc:2.0.5',
             'org.testcontainers:testcontainers-postgresql:2.0.5'
     )
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
 
 publishing {
@@ -200,11 +206,17 @@ tasks.register('validateGeneratedSchema') {
                 'io/dsub/opendiscogs/jooq/Tables.java',
                 'io/dsub/opendiscogs/jooq/tables/Artist.java',
                 'io/dsub/opendiscogs/jooq/tables/DiscogsDump.java',
+                'io/dsub/opendiscogs/jooq/tables/DiscogsImportCheckpoint.java',
+                'io/dsub/opendiscogs/jooq/tables/DiscogsImportRun.java',
+                'io/dsub/opendiscogs/jooq/tables/DiscogsImportRunDump.java',
                 'io/dsub/opendiscogs/jooq/tables/Label.java',
                 'io/dsub/opendiscogs/jooq/tables/Master.java',
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItem.java',
                 'io/dsub/opendiscogs/jooq/tables/records/ArtistRecord.java',
                 'io/dsub/opendiscogs/jooq/tables/records/DiscogsDumpRecord.java',
+                'io/dsub/opendiscogs/jooq/tables/records/DiscogsImportCheckpointRecord.java',
+                'io/dsub/opendiscogs/jooq/tables/records/DiscogsImportRunRecord.java',
+                'io/dsub/opendiscogs/jooq/tables/records/DiscogsImportRunDumpRecord.java',
                 'io/dsub/opendiscogs/jooq/tables/records/LabelRecord.java',
                 'io/dsub/opendiscogs/jooq/tables/records/MasterRecord.java',
                 'io/dsub/opendiscogs/jooq/tables/records/ReleaseItemRecord.java'

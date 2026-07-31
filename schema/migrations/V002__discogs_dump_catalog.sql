@@ -15,9 +15,14 @@ create table if not exists public.discogs_dump
     checksum_sha256     char(64)     not null
         constraint ck_discogs_dump_checksum_sha256
             check (checksum_sha256 ~ '^[0-9A-Fa-f]{64}$'),
+    size_bytes          bigint       not null
+        constraint ck_discogs_dump_size_bytes
+            check (size_bytes >= 0),
     uri                 text         not null,
-    constraint uq_discogs_dump_date_entity_type
-        unique (dump_date, entity_type)
+    constraint uq_discogs_dump_date_entity_type_checksum
+        unique (dump_date, entity_type, checksum_sha256),
+    constraint uq_discogs_dump_id_entity_type
+        unique (id, entity_type)
 );
 
 create index ix_discogs_dump_date

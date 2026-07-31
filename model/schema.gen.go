@@ -13,6 +13,9 @@ var TableNames = []string{
 	"artist_name_variation",
 	"artist_url",
 	"discogs_dump",
+	"discogs_import_checkpoint",
+	"discogs_import_run",
+	"discogs_import_run_dump",
 	"genre",
 	"label",
 	"label_release_item",
@@ -122,11 +125,57 @@ type DiscogsDump struct {
 	DumpDate       time.Time `db:"dump_date" json:"dump_date" gorm:"column:dump_date"`
 	EntityType     string    `db:"entity_type" json:"entity_type" gorm:"column:entity_type"`
 	ChecksumSHA256 string    `db:"checksum_sha256" json:"checksum_sha256" gorm:"column:checksum_sha256"`
+	SizeBytes      int64     `db:"size_bytes" json:"size_bytes" gorm:"column:size_bytes"`
 	URI            string    `db:"uri" json:"uri" gorm:"column:uri"`
 }
 
 // TableName returns the PostgreSQL table represented by DiscogsDump.
 func (DiscogsDump) TableName() string { return "discogs_dump" }
+
+// DiscogsImportCheckpoint represents a row in discogs_import_checkpoint.
+type DiscogsImportCheckpoint struct {
+	EntityType       *string    `db:"entity_type" json:"entity_type" gorm:"column:entity_type"`
+	DumpDate         *time.Time `db:"dump_date" json:"dump_date" gorm:"column:dump_date"`
+	ChecksumSHA256   *string    `db:"checksum_sha256" json:"checksum_sha256" gorm:"column:checksum_sha256"`
+	SizeBytes        *int64     `db:"size_bytes" json:"size_bytes" gorm:"column:size_bytes"`
+	ETag             *string    `db:"etag" json:"etag" gorm:"column:etag"`
+	URI              *string    `db:"uri" json:"uri" gorm:"column:uri"`
+	ImportRunID      *int64     `db:"import_run_id" json:"import_run_id" gorm:"column:import_run_id"`
+	Processor        *string    `db:"processor" json:"processor" gorm:"column:processor"`
+	ProcessorVersion *string    `db:"processor_version" json:"processor_version" gorm:"column:processor_version"`
+	AppliedAt        *time.Time `db:"applied_at" json:"applied_at" gorm:"column:applied_at"`
+}
+
+// TableName returns the PostgreSQL table represented by DiscogsImportCheckpoint.
+func (DiscogsImportCheckpoint) TableName() string { return "discogs_import_checkpoint" }
+
+// DiscogsImportRun represents a row in discogs_import_run.
+type DiscogsImportRun struct {
+	ID                      int64      `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
+	CreatedAt               time.Time  `db:"created_at" json:"created_at" gorm:"column:created_at"`
+	StartedAt               time.Time  `db:"started_at" json:"started_at" gorm:"column:started_at"`
+	CompletedAt             *time.Time `db:"completed_at" json:"completed_at" gorm:"column:completed_at"`
+	ManifestSHA256          string     `db:"manifest_sha256" json:"manifest_sha256" gorm:"column:manifest_sha256"`
+	Status                  string     `db:"status" json:"status" gorm:"column:status"`
+	ForceRequested          bool       `db:"force_requested" json:"force_requested" gorm:"column:force_requested"`
+	AllowDowngradeRequested bool       `db:"allow_downgrade_requested" json:"allow_downgrade_requested" gorm:"column:allow_downgrade_requested"`
+	Processor               string     `db:"processor" json:"processor" gorm:"column:processor"`
+	ProcessorVersion        string     `db:"processor_version" json:"processor_version" gorm:"column:processor_version"`
+	FailureMessage          *string    `db:"failure_message" json:"failure_message" gorm:"column:failure_message"`
+}
+
+// TableName returns the PostgreSQL table represented by DiscogsImportRun.
+func (DiscogsImportRun) TableName() string { return "discogs_import_run" }
+
+// DiscogsImportRunDump represents a row in discogs_import_run_dump.
+type DiscogsImportRunDump struct {
+	ImportRunID int64  `db:"import_run_id" json:"import_run_id" gorm:"column:import_run_id;primaryKey"`
+	EntityType  string `db:"entity_type" json:"entity_type" gorm:"column:entity_type;primaryKey"`
+	DumpID      int64  `db:"dump_id" json:"dump_id" gorm:"column:dump_id"`
+}
+
+// TableName returns the PostgreSQL table represented by DiscogsImportRunDump.
+func (DiscogsImportRunDump) TableName() string { return "discogs_import_run_dump" }
 
 // Genre represents a row in genre.
 type Genre struct {

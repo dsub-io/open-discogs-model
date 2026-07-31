@@ -62,10 +62,21 @@ Files under `schema/migrations` are the only hand-maintained database schema
 source. The Java jOOQ classes and Go structs are generated from a PostgreSQL
 database created from those ordered migrations.
 
-The schema includes the OpenDiscogs catalog tables and a `discogs_dump` table
-for recording the exact dated dump, checksum, entity type, ETag, and source URI
-used by an import. Application-specific Spring Batch metadata and query logic do
-not belong to this module.
+The schema includes the OpenDiscogs catalog tables, immutable dump provenance,
+and import-run history. The shared
+[`import-manifest-v1`](schema/contracts/import-manifest-v1.md) contract gives
+Java and Go the same content fingerprint and skip/force semantics.
+Application-specific Spring Batch metadata and query logic do not belong to
+this module.
+
+By default an importer skips a manifest that already has a successful run.
+Failed or incomplete runs remain retryable, and an explicit force option may
+reprocess a successful manifest. Forced reprocessing must still converge on the
+same normalized business state. The `discogs_import_checkpoint` view exposes
+the last successfully applied dump date and provenance for each entity type.
+Per-entity PostgreSQL advisory locks allow disjoint imports to run concurrently
+while rejecting overlapping writers. Older dumps are rejected unless a
+separate, audited downgrade option is explicitly requested.
 
 ## Development
 
