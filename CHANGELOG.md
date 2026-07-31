@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/dsub-io/open-discogs-model/compare/v0.1.2...v0.1.3) (2026-07-31)
+
+
+### Documentation
+
+* use public attribution ([#32](https://github.com/dsub-io/open-discogs-model/issues/32)) ([9c7aff5](https://github.com/dsub-io/open-discogs-model/commit/9c7aff5aea8898aa81fc84a13e649da532eba7e4))
+
 ## [0.1.2](https://github.com/dsub-io/open-discogs-model/compare/v0.1.1...v0.1.2) (2026-07-31)
 
 
