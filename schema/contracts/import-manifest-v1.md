@@ -22,7 +22,9 @@ To compute `manifest_sha256`:
 4. compute the lowercase hexadecimal SHA-256 of the complete preimage.
 
 URI, ETag, byte size, processor, and processor version are retained as
-provenance but are not part of content identity.
+provenance but are not part of content identity. ETag is deliberately not
+unique because the current HTML source uses the versioned file path as its
+fallback identifier and upstream may reissue that path with different bytes.
 
 Before starting work, an importer checks for a successful run with the same
 manifest fingerprint. It skips that manifest unless force was explicitly

@@ -69,6 +69,10 @@ Java and Go the same content fingerprint and skip/force semantics.
 Application-specific Spring Batch metadata and query logic do not belong to
 this module.
 
+Dump content versions are unique by date, entity type, and SHA-256. ETag is
+indexed for lookup but is not unique because a versioned source path can be
+reissued with different bytes.
+
 By default an importer skips a manifest that already has a successful run.
 Failed or incomplete runs remain retryable, and an explicit force option may
 reprocess a successful manifest. Forced reprocessing must still converge on the
