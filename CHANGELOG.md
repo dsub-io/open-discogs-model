@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/dsub-io/open-discogs-model/compare/v0.2.0...v0.2.1) (2026-08-10)
+
+
+### Bug Fixes
+
+* lock import reference dependencies ([#41](https://github.com/dsub-io/open-discogs-model/issues/41)) ([4bf7cc6](https://github.com/dsub-io/open-discogs-model/commit/4bf7cc6533da6bc05e6c945ae7876a7d12b0ec3a))
+
 ## [0.2.0](https://github.com/dsub-io/open-discogs-model/compare/v0.1.2...v0.2.0) (2026-08-10)
 
 
