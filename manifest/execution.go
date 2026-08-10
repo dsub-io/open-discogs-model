@@ -17,6 +17,13 @@ var entityLockKeys = map[string]int32{
 	"release": 4,
 }
 
+var entityLockDependencies = map[string][]string{
+	"artist":  {"artist"},
+	"label":   {"label"},
+	"master":  {"artist", "master"},
+	"release": {"artist", "label", "master", "release"},
+}
+
 // EntityLockKey returns the stable second PostgreSQL advisory lock key.
 func EntityLockKey(entityType string) (int32, error) {
 	key, found := entityLockKeys[strings.ToLower(entityType)]
@@ -43,6 +50,19 @@ func OrderedEntityTypes(entityTypes []string) ([]string, error) {
 	}
 	sort.Strings(ordered)
 	return ordered, nil
+}
+
+// RequiredLockEntityTypes expands selected entities to every read and write dependency lock.
+func RequiredLockEntityTypes(selectedEntityTypes []string) ([]string, error) {
+	selected, err := OrderedEntityTypes(selectedEntityTypes)
+	if err != nil {
+		return nil, err
+	}
+	lockTypes := make([]string, 0, len(entityLockKeys))
+	for _, entityType := range selected {
+		lockTypes = append(lockTypes, entityLockDependencies[entityType]...)
+	}
+	return OrderedEntityTypes(lockTypes)
 }
 
 // IsDowngrade reports whether a candidate predates the currently applied dump.
