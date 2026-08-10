@@ -144,6 +144,7 @@ type DiscogsImportCheckpoint struct {
 	Processor        *string    `db:"processor" json:"processor" gorm:"column:processor"`
 	ProcessorVersion *string    `db:"processor_version" json:"processor_version" gorm:"column:processor_version"`
 	AppliedAt        *time.Time `db:"applied_at" json:"applied_at" gorm:"column:applied_at"`
+	ResumedFromRunID *int64     `db:"resumed_from_run_id" json:"resumed_from_run_id" gorm:"column:resumed_from_run_id"`
 }
 
 // TableName returns the PostgreSQL table represented by DiscogsImportCheckpoint.
@@ -162,6 +163,7 @@ type DiscogsImportRun struct {
 	Processor               string     `db:"processor" json:"processor" gorm:"column:processor"`
 	ProcessorVersion        string     `db:"processor_version" json:"processor_version" gorm:"column:processor_version"`
 	FailureMessage          *string    `db:"failure_message" json:"failure_message" gorm:"column:failure_message"`
+	ResumedFromRunID        *int64     `db:"resumed_from_run_id" json:"resumed_from_run_id" gorm:"column:resumed_from_run_id"`
 }
 
 // TableName returns the PostgreSQL table represented by DiscogsImportRun.
@@ -169,9 +171,12 @@ func (DiscogsImportRun) TableName() string { return "discogs_import_run" }
 
 // DiscogsImportRunDump represents a row in discogs_import_run_dump.
 type DiscogsImportRunDump struct {
-	ImportRunID int64  `db:"import_run_id" json:"import_run_id" gorm:"column:import_run_id;primaryKey"`
-	EntityType  string `db:"entity_type" json:"entity_type" gorm:"column:entity_type;primaryKey"`
-	DumpID      int64  `db:"dump_id" json:"dump_id" gorm:"column:dump_id"`
+	ImportRunID    int64      `db:"import_run_id" json:"import_run_id" gorm:"column:import_run_id;primaryKey"`
+	EntityType     string     `db:"entity_type" json:"entity_type" gorm:"column:entity_type;primaryKey"`
+	DumpID         int64      `db:"dump_id" json:"dump_id" gorm:"column:dump_id"`
+	ProcessedItems int64      `db:"processed_items" json:"processed_items" gorm:"column:processed_items"`
+	LastProgressAt *time.Time `db:"last_progress_at" json:"last_progress_at" gorm:"column:last_progress_at"`
+	CompletedAt    *time.Time `db:"completed_at" json:"completed_at" gorm:"column:completed_at"`
 }
 
 // TableName returns the PostgreSQL table represented by DiscogsImportRunDump.

@@ -63,9 +63,13 @@ source. The Java jOOQ classes and Go structs are generated from a PostgreSQL
 database created from those ordered migrations.
 
 The schema includes the OpenDiscogs catalog tables, immutable dump provenance,
-and import-run history. The shared
+append-only import-run identity, and bounded progress that becomes historical
+when a run completes. The shared
 [`import-manifest-v1`](schema/contracts/import-manifest-v1.md) contract gives
 Java and Go the same content fingerprint and skip/force semantics.
+The bounded [`import-progress-v1`](schema/contracts/import-progress-v1.md)
+contract records at most one progress row per selected entity and run so a
+retry can resume committed chunks without progress growing with dump size.
 Application-specific Spring Batch metadata and query logic do not belong to
 this module.
 
@@ -78,6 +82,10 @@ Failed or incomplete runs remain retryable, and an explicit force option may
 reprocess a successful manifest. Forced reprocessing must still converge on the
 same normalized business state. The `discogs_import_checkpoint` view exposes
 the last successfully applied dump date and provenance for each entity type.
+Progress advances in the same transaction as a root entity's complete
+canonical relation set. A retry may resume only from an identical manifest,
+processor, processor version, entity type, and dump, while forced imports
+always start from zero.
 Per-entity PostgreSQL advisory locks allow disjoint imports to run concurrently
 while rejecting overlapping writers. Older dumps are rejected unless a
 separate, audited downgrade option is explicitly requested.

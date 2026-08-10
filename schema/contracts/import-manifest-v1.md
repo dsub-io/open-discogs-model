@@ -52,6 +52,11 @@ completed. A failed or interrupted run remains retryable. Reprocessing a
 manifest with force must leave the same normalized business rows as the first
 successful import.
 
+The adjacent [`import-progress-v1`](import-progress-v1.md) contract defines
+when committed entity progress may be resumed by a later run. Progress never
+changes manifest identity or permits a successful manifest to be skipped under
+different content.
+
 The `discogs_import_checkpoint` view exposes the last successfully applied dump
 for each entity type. It is derived from immutable run history so checkpoint
 dates cannot drift away from the run and dump that produced them.
