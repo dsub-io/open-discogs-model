@@ -54,3 +54,10 @@ an unfinished run can resume.
 The progress contract assumes each committed root entity has converged to the
 exact relation set represented by the dump. Repeating a chunk after a rollback
 must therefore produce the same normalized business state.
+
+Import admission uses exclusive advisory locks for both selected entities and
+their reference dependencies. `master` requires `artist` and `master` locks;
+`release` requires `artist`, `label`, `master`, and `release` locks because it
+reads all three reference sets and updates `master.main_release_id`. Locks are
+always acquired in canonical entity order. This prevents a partial import from
+filtering against a moving reference set or racing a cross-entity write.

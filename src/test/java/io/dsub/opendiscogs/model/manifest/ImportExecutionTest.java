@@ -27,6 +27,19 @@ class ImportExecutionTest {
   }
 
   @Test
+  void expandsSelectedEntitiesToTheirReadAndWriteLockDependencies() {
+    assertEquals(
+        List.of("artist", "master"),
+        ImportExecution.requiredLockEntityTypes(List.of("master")));
+    assertEquals(
+        List.of("artist", "label", "master", "release"),
+        ImportExecution.requiredLockEntityTypes(List.of("label", "release")));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> ImportExecution.requiredLockEntityTypes(List.of("unknown")));
+  }
+
+  @Test
   void comparesCandidateAgainstCheckpointDate() {
     LocalDate checkpoint = LocalDate.of(2026, 7, 1);
 

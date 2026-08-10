@@ -19,6 +19,12 @@ public final class ImportExecution {
 
   private static final Map<String, Integer> ENTITY_LOCK_KEYS =
       Map.of("artist", 1, "label", 2, "master", 3, "release", 4);
+  private static final Map<String, List<String>> ENTITY_LOCK_DEPENDENCIES =
+      Map.of(
+          "artist", List.of("artist"),
+          "label", List.of("label"),
+          "master", List.of("artist", "master"),
+          "release", List.of("artist", "label", "master", "release"));
 
   private ImportExecution() {
   }
@@ -51,6 +57,18 @@ public final class ImportExecution {
       unique.add(entityType);
     }
     return unique.stream().sorted().toList();
+  }
+
+  /**
+   * Returns every entity lock needed to update the selected entities without racing a referenced
+   * entity import.
+   */
+  public static List<String> requiredLockEntityTypes(Collection<String> selectedEntityTypes) {
+    return orderedEntityTypes(selectedEntityTypes).stream()
+        .flatMap(entityType -> ENTITY_LOCK_DEPENDENCIES.get(entityType).stream())
+        .distinct()
+        .sorted()
+        .toList();
   }
 
   /**

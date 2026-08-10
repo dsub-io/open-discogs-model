@@ -30,6 +30,31 @@ func TestOrderedEntityTypesAndLockKeys(t *testing.T) {
 	}
 }
 
+func TestRequiredLockEntityTypes(t *testing.T) {
+	t.Parallel()
+
+	masterLocks, err := RequiredLockEntityTypes([]string{"master"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(masterLocks, []string{"artist", "master"}) {
+		t.Fatalf("RequiredLockEntityTypes(master) = %v", masterLocks)
+	}
+
+	releaseLocks, err := RequiredLockEntityTypes([]string{"label", "release"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := []string{"artist", "label", "master", "release"}
+	if !reflect.DeepEqual(releaseLocks, expected) {
+		t.Fatalf("RequiredLockEntityTypes(label, release) = %v", releaseLocks)
+	}
+
+	if _, err := RequiredLockEntityTypes([]string{"unknown"}); err == nil {
+		t.Fatal("unknown entity type was accepted")
+	}
+}
+
 func TestIsDowngrade(t *testing.T) {
 	t.Parallel()
 
