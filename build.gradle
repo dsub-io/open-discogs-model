@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'org.jooq.jooq-codegen-gradle' version '3.21.6'
+    id 'org.jooq.jooq-codegen-gradle' version '3.21.7'
 }
 
 group = 'io.dsub.opendiscogs'
@@ -31,7 +31,7 @@ sourceSets {
 }
 
 dependencies {
-    api 'org.jooq:jooq:3.21.6'
+    api 'org.jooq:jooq:3.21.7'
     testImplementation 'org.junit.jupiter:junit-jupiter:6.1.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.1.2'
 
