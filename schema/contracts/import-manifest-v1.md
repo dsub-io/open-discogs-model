@@ -28,9 +28,13 @@ unique because the current HTML source uses the versioned file path as its
 fallback identifier and upstream may reissue that path with different bytes.
 
 Before starting work, an importer checks for a successful run with the same
-manifest fingerprint. It skips that manifest unless force was explicitly
-requested. Failed and running records never authorize a skip. At most one
-running import of a manifest may exist at a time.
+manifest fingerprint. It may skip only when every dump in that successful run
+is still the current checkpoint for its entity and no failed or abandoned run
+completed for those entities after the checkpoints were applied. A later
+failed run may have committed only part of another dump, so historical success
+alone does not prove that the current business rows still represent that
+manifest. Force always disables the skip. At most one running import of a
+manifest may exist at a time.
 
 Importers also serialize writes per entity type with PostgreSQL session
 advisory locks. The shared two-key namespace is `1329876273`; entity keys are
@@ -46,6 +50,12 @@ to close the preflight race. A candidate whose dump date predates that entity's
 checkpoint is rejected. `force` does not bypass this rule. An explicit
 `allow_downgrade` option is required and is recorded on the run when an
 operator intentionally applies older data.
+
+Each committing unit fences against its owning run while that run is still
+`running`. Marking an abandoned run `failed` must serialize with in-flight
+units: a unit fenced first may commit atomically and enter the resume ledger;
+otherwise its business writes and progress roll back. A delayed worker must
+never commit after its run has become `failed`.
 
 An importer marks a run successful only after every requested entity type has
 completed. A failed or interrupted run remains retryable. Reprocessing a
