@@ -30,18 +30,26 @@ following values match exactly:
 
 - manifest SHA-256;
 - processor name and processor version;
-- entity type and dump ID.
+- entity type and dump ID;
 - chunk size.
+
+Progress is not resumable if a newer successful checkpoint has overwritten any
+selected entity with a different dump, processor, or processor version. This
+check is relative to the failed run's completion time: an older checkpoint does
+not invalidate chunks that the failed run committed afterward.
 
 The new run records that source run in `resumed_from_run_id` and copies its
 summary and chunk ledger atomically. A forced import starts every entity at zero
 and does not resume prior progress. Importers may re-read committed source
 elements while locating ranges, but they must not rewrite or recount them.
 
-Once a retry owns a copied ledger, older failed-run chunk rows may be pruned.
-Chunk rows for a successful run may also be pruned because successful manifest
-identity, totals, and completion remain in the run history. Pruning must never
-remove the only ledger from which an unfinished run can resume.
+Once a retry owns a copied ledger, the source rows are transferred atomically.
+Other failed-run rows may be pruned only when every entity/dump pair is the
+current successful checkpoint produced by the same processor version;
+historical success is insufficient. Chunk rows for a successful run may also
+be pruned because successful manifest identity, totals, and completion remain
+in the run history. Pruning must never remove the only valid ledger from which
+an unfinished run can resume.
 
 The progress contract assumes each committed root entity has converged to the
 exact relation set represented by the dump. Repeating a chunk after a rollback
