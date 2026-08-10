@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.dsub.opendiscogs:open-discogs-model-jooq:0.1.2'
+    implementation 'io.dsub.opendiscogs:open-discogs-model-jooq:0.2.0'
 }
 ```
 <!-- x-release-please-end -->
@@ -37,7 +37,7 @@ The Go model is published by the same Git tag as the Maven artifact.
 
 <!-- x-release-please-start-version -->
 ```bash
-go get github.com/dsub-io/open-discogs-model@v0.1.2
+go get github.com/dsub-io/open-discogs-model@v0.2.0
 ```
 <!-- x-release-please-end -->
 

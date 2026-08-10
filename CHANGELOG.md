@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://github.com/dsub-io/open-discogs-model/compare/v0.1.2...v0.2.0) (2026-08-10)
+
+
+### Features
+
+* add durable import progress ([#37](https://github.com/dsub-io/open-discogs-model/issues/37)) ([a953983](https://github.com/dsub-io/open-discogs-model/commit/a95398312e5e2898d49314c590abe89c1ca4e734))
+
+
+### Bug Fixes
+
+* make import progress concurrency-safe ([#39](https://github.com/dsub-io/open-discogs-model/issues/39)) ([47f58cd](https://github.com/dsub-io/open-discogs-model/commit/47f58cd0099df7f0b44dd76a2de7363fa192db66))
+
 ## [0.1.2](https://github.com/dsub-io/open-discogs-model/compare/v0.1.1...v0.1.2) (2026-07-31)
 
 
