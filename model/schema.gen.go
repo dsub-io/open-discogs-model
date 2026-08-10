@@ -15,6 +15,7 @@ var TableNames = []string{
 	"discogs_dump",
 	"discogs_import_checkpoint",
 	"discogs_import_run",
+	"discogs_import_run_chunk",
 	"discogs_import_run_dump",
 	"genre",
 	"label",
@@ -169,6 +170,19 @@ type DiscogsImportRun struct {
 // TableName returns the PostgreSQL table represented by DiscogsImportRun.
 func (DiscogsImportRun) TableName() string { return "discogs_import_run" }
 
+// DiscogsImportRunChunk represents a row in discogs_import_run_chunk.
+type DiscogsImportRunChunk struct {
+	ImportRunID    int64     `db:"import_run_id" json:"import_run_id" gorm:"column:import_run_id;primaryKey"`
+	EntityType     string    `db:"entity_type" json:"entity_type" gorm:"column:entity_type;primaryKey"`
+	ChunkIndex     int64     `db:"chunk_index" json:"chunk_index" gorm:"column:chunk_index;primaryKey"`
+	FirstItemIndex int64     `db:"first_item_index" json:"first_item_index" gorm:"column:first_item_index"`
+	ItemCount      int64     `db:"item_count" json:"item_count" gorm:"column:item_count"`
+	CompletedAt    time.Time `db:"completed_at" json:"completed_at" gorm:"column:completed_at"`
+}
+
+// TableName returns the PostgreSQL table represented by DiscogsImportRunChunk.
+func (DiscogsImportRunChunk) TableName() string { return "discogs_import_run_chunk" }
+
 // DiscogsImportRunDump represents a row in discogs_import_run_dump.
 type DiscogsImportRunDump struct {
 	ImportRunID    int64      `db:"import_run_id" json:"import_run_id" gorm:"column:import_run_id;primaryKey"`
@@ -177,6 +191,9 @@ type DiscogsImportRunDump struct {
 	ProcessedItems int64      `db:"processed_items" json:"processed_items" gorm:"column:processed_items"`
 	LastProgressAt *time.Time `db:"last_progress_at" json:"last_progress_at" gorm:"column:last_progress_at"`
 	CompletedAt    *time.Time `db:"completed_at" json:"completed_at" gorm:"column:completed_at"`
+	ChunkSize      *int64     `db:"chunk_size" json:"chunk_size" gorm:"column:chunk_size"`
+	TotalItems     *int64     `db:"total_items" json:"total_items" gorm:"column:total_items"`
+	TotalChunks    *int64     `db:"total_chunks" json:"total_chunks" gorm:"column:total_chunks"`
 }
 
 // TableName returns the PostgreSQL table represented by DiscogsImportRunDump.

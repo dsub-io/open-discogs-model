@@ -67,9 +67,10 @@ append-only import-run identity, and bounded progress that becomes historical
 when a run completes. The shared
 [`import-manifest-v1`](schema/contracts/import-manifest-v1.md) contract gives
 Java and Go the same content fingerprint and skip/force semantics.
-The bounded [`import-progress-v1`](schema/contracts/import-progress-v1.md)
-contract records at most one progress row per selected entity and run so a
-retry can resume committed chunks without progress growing with dump size.
+The [`import-progress-v1`](schema/contracts/import-progress-v1.md) contract
+keeps one summary row per selected entity and a resumable chunk ledger. The
+ledger supports parallel commits without treating gaps as completed work and
+may be pruned once a successful run no longer needs it.
 Application-specific Spring Batch metadata and query logic do not belong to
 this module.
 
