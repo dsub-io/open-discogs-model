@@ -23,6 +23,7 @@ func TestMigrations(t *testing.T) {
 		"V002__discogs_dump_catalog.sql",
 		"V003__discogs_import_history.sql",
 		"V004__allow_reissued_dump_paths.sql",
+		"V005__durable_import_progress.sql",
 	}
 	if len(entries) != len(want) {
 		t.Fatalf("migration count = %d, want %d", len(entries), len(want))

@@ -5,21 +5,52 @@ repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 temporary_dir="$(mktemp -d)"
 container_name="open-discogs-model-generator-$$"
 catalog_path="$temporary_dir/catalog.tsv"
+postgres_image="postgres:18.4-alpine"
+image_was_present=false
 
 cleanup() {
+  case "$container_name" in
+    open-discogs-model-generator-[0-9]*) ;;
+    *)
+      printf 'Refusing to clean unexpected container name: %s\n' "$container_name" >&2
+      return 1
+      ;;
+  esac
   docker rm --force "$container_name" >/dev/null 2>&1 || true
-  rm -r "$temporary_dir"
+  if docker ps -a --filter "name=^/${container_name}$" --format '{{.Names}}' | grep -q .; then
+    printf 'Generator container cleanup failed: %s\n' "$container_name" >&2
+    return 1
+  fi
+  if [[ "$image_was_present" == false ]]; then
+    docker image rm "$postgres_image" >/dev/null 2>&1 || true
+  fi
+  rm -r -- "$temporary_dir"
 }
 trap cleanup EXIT
 
+if docker image inspect "$postgres_image" >/dev/null 2>&1; then
+  image_was_present=true
+fi
+
 docker run \
   --detach \
-  --rm \
   --name "$container_name" \
+  --label io.dsub.test-owner=open-discogs-model \
+  --tmpfs /var/lib/postgresql:rw,noexec,nosuid,size=512m \
   --env POSTGRES_DB=modelgen \
   --env POSTGRES_PASSWORD=modelgen \
   --env POSTGRES_USER=modelgen \
-  postgres:18.4-alpine >/dev/null
+  "$postgres_image" >/dev/null
+
+volume_mounts="$(
+  docker inspect \
+    --format '{{range .Mounts}}{{if eq .Type "volume"}}{{println .Name}}{{end}}{{end}}' \
+    "$container_name"
+)"
+if [[ -n "$volume_mounts" ]]; then
+  printf 'Generator unexpectedly created Docker volumes: %s\n' "$volume_mounts" >&2
+  exit 1
+fi
 
 for attempt in {1..30}; do
   if docker exec "$container_name" \
