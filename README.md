@@ -91,6 +91,17 @@ Per-entity PostgreSQL advisory locks allow disjoint imports to run concurrently
 while rejecting overlapping writers. Older dumps are rejected unless a
 separate, audited downgrade option is explicitly requested.
 
+The schema also owns the bounded read-path indexes used by the Go API. Trigram
+indexes cover artist and label names plus master and release titles; no index is
+created for large profile, contact, or notes fields. Reverse relationship keys
+and release date, country, master, and master-membership filters have dedicated
+indexes. PostgreSQL installations must make the bundled `pg_trgm` extension
+available to the migration owner. After a bulk import, run `ANALYZE` before
+serving traffic so the planner sees the imported data distribution.
+The reproducible synthetic before/after results and their full-dump limitations
+are recorded in
+[`docs/performance/2026-08-11-api-query-indexes.md`](docs/performance/2026-08-11-api-query-indexes.md).
+
 ## Development
 
 The complete local verification requires Docker, Go 1.26, and Temurin 21.
@@ -126,7 +137,7 @@ material are read only from encrypted GitHub Actions secrets.
 
 - [OpenDiscogs Batch](https://github.com/dsub-io/open-discogs-batch)
 - [Go OpenDiscogs Batch](https://github.com/dsub-io/go-open-discogs-batch)
-- [OpenDiscogs API](https://github.com/dsub-io/open-discogs-api)
+- [Go OpenDiscogs API](https://github.com/dsub-io/go-open-discogs-api)
 
 ## License
 
