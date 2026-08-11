@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.2](https://github.com/dsub-io/open-discogs-model/compare/v0.2.1...v0.2.2) (2026-08-11)
+
+
+### Performance Improvements
+
+* add indexed API query paths ([#44](https://github.com/dsub-io/open-discogs-model/issues/44)) ([85c43ad](https://github.com/dsub-io/open-discogs-model/commit/85c43ad062ed273c856cbc2ab6246f22280aef64))
+  * release-title substring p95 fell from 194.535 ms to 0.136 ms (99.930%)
+    and artist-release lookup p95 fell from 17.309 ms to 0.061 ms (99.648%)
+    in the reproducible 1,000,000-release synthetic benchmark
+  * canonical indexes added 164.1 MiB (54.7%) to that synthetic database;
+    full-dump storage, import duration, cold I/O, and concurrency remain
+    pre-production validation gates
+
 ## [0.2.1](https://github.com/dsub-io/open-discogs-model/compare/v0.2.0...v0.2.1) (2026-08-10)
 
 
