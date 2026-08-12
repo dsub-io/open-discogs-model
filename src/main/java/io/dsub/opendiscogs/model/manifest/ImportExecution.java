@@ -20,7 +20,7 @@ public final class ImportExecution {
   private static final Map<String, Integer> ENTITY_LOCK_KEYS =
       Map.of("artist", 1, "label", 2, "master", 3, "release", 4);
   private static final Map<String, Integer> ENTITY_IMPORT_CONTRACT_REVISIONS =
-      Map.of("artist", 1, "label", 1, "master", 1, "release", 2);
+      Map.of("artist", 1, "label", 1, "master", 1, "release", 3);
   private static final Map<String, List<String>> ENTITY_LOCK_DEPENDENCIES =
       Map.of(
           "artist", List.of("artist"),

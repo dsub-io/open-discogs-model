@@ -33,7 +33,7 @@ func TestOrderedEntityTypesAndLockKeys(t *testing.T) {
 func TestImportContractRevision(t *testing.T) {
 	t.Parallel()
 
-	want := map[string]int32{"artist": 1, "label": 1, "master": 1, "release": 2}
+	want := map[string]int32{"artist": 1, "label": 1, "master": 1, "release": 3}
 	for entityType, expected := range want {
 		revision, err := ImportContractRevision(entityType)
 		if err != nil {

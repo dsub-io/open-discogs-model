@@ -101,7 +101,9 @@ Each `discogs_import_run_dump` row also records the entity-specific import
 contract revision. Successful checkpoints are reusable across Java and Go only
 at the current entity revision; interrupted runs additionally require the same
 processor name and version. V009 preserves existing rows at revision `1` and
-sets the current contract to `artist=1`, `label=1`, `master=1`, and `release=2`.
+sets the release convergence contract to revision `2`. Importers that implement
+V010-V016 relation identity use `artist=1`, `label=1`, `master=1`, and
+`release=3`.
 Application-specific Spring Batch metadata and query logic do not belong to
 this module.
 
@@ -145,6 +147,28 @@ validates existing data before adding these constraints; it does not silently
 repair conflicts. Creating the supporting unique indexes on a populated
 production database requires a measured maintenance window and sufficient
 temporary disk capacity.
+
+Release credited-artist, format, identifier, image, track, video, and work relations
+store the SHA-256 identity defined by
+[`release-relation-identity-v1`](schema/contracts/release-relation-identity-v1.md).
+V010-V016 deliberately add nullable, unindexed digest columns with unvalidated
+checks: PostgreSQL enforces the checks for new writes without rewriting or
+scanning existing relation tables. Each relation has its own migration with a
+five-second lock timeout so a busy production database rolls back instead of
+holding locks across unrelated relation tables. Revision 3 importers transactionally
+replace legacy null identities as each release root is processed. This bounded,
+resumable phase keeps the existing 32-bit key as a deterministic compatibility
+slot; it does not claim that the online index transition is complete.
+Monthly public dumps contain no release images, so dump importers do not
+backfill `release_item_image`; a future image source requires its own policy and
+import boundary. Digest-index cutover for that table remains blocked until a
+bounded maintenance job backfills surviving `file_name` rows; rows already lost
+to a legacy 32-bit collision cannot be reconstructed from the database alone.
+
+Discogs format quantity can exceed a signed 32-bit integer. V011 preserves the
+canonical decimal value in `release_item_format.quantity_text`; the existing
+`quantity` column remains populated only when the value fits for compatibility.
+Legacy rows remain valid and are filled as their release roots are reconciled.
 
 ## Development
 

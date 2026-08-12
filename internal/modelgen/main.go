@@ -161,6 +161,8 @@ func columnType(field column) (string, error) {
 		goType = "int64"
 	case "boolean":
 		goType = "bool"
+	case "bytea":
+		return "[]byte", nil
 	case "character", "character varying", "text":
 		goType = "string"
 	case "date", "timestamp with time zone", "timestamp without time zone":

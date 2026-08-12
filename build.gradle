@@ -261,6 +261,37 @@ tasks.register('validateGeneratedSchema') {
                     "Generated schema is missing required sources:\n - "
                             + missingSources.join('\n - '))
         }
+
+        def requiredRelationFields = [
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemCreditedArtist.java':
+                        ['IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemFormat.java':
+                        ['IDENTITY_SHA256', 'QUANTITY_TEXT'],
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemIdentifier.java':
+                        ['IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemImage.java':
+                        ['IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemTrack.java':
+                        ['IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemVideo.java':
+                        ['IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemWork.java':
+                        ['IDENTITY_SHA256']
+        ]
+        def missingRelationFields = requiredRelationFields.collectMany { path, fragments ->
+            def source = generatedDirectory.file(path).asFile
+            if (!source.isFile()) {
+                return ["${path}: missing source"]
+            }
+            def text = source.getText('UTF-8')
+            return fragments.findAll { !text.contains(it) }
+                    .collect { "${path}: ${it}" }
+        }
+        if (!missingRelationFields.isEmpty()) {
+            throw new GradleException(
+                    "Generated schema is missing release relation fields:\n - "
+                            + missingRelationFields.join('\n - '))
+        }
     }
 }
 

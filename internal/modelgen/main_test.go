@@ -35,6 +35,7 @@ func TestColumnType(t *testing.T) {
 		want   string
 	}{
 		{name: "integer", column: column{dataType: "integer"}, want: "int32"},
+		{name: "nullable bytea", column: column{dataType: "bytea", nullable: true}, want: "[]byte"},
 		{name: "nullable text", column: column{dataType: "text", nullable: true}, want: "*string"},
 		{name: "timestamp", column: column{dataType: "timestamp without time zone"}, want: "time.Time"},
 	}

@@ -368,6 +368,7 @@ type ReleaseItemCreditedArtist struct {
 	Role           *string   `db:"role" json:"role" gorm:"column:role"`
 	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
 	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemCreditedArtist.
@@ -384,6 +385,8 @@ type ReleaseItemFormat struct {
 	Quantity       *int32    `db:"quantity" json:"quantity" gorm:"column:quantity"`
 	Text           *string   `db:"text" json:"text" gorm:"column:text"`
 	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
+	QuantityText   *string   `db:"quantity_text" json:"quantity_text" gorm:"column:quantity_text"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemFormat.
@@ -411,6 +414,7 @@ type ReleaseItemIdentifier struct {
 	Type           *string   `db:"type" json:"type" gorm:"column:type"`
 	Value          *string   `db:"value" json:"value" gorm:"column:value"`
 	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemIdentifier.
@@ -424,6 +428,7 @@ type ReleaseItemImage struct {
 	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
 	FileName       *string   `db:"file_name" json:"file_name" gorm:"column:file_name"`
 	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemImage.
@@ -451,6 +456,7 @@ type ReleaseItemTrack struct {
 	Position       *string   `db:"position" json:"position" gorm:"column:position"`
 	Title          *string   `db:"title" json:"title" gorm:"column:title"`
 	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemTrack.
@@ -466,6 +472,7 @@ type ReleaseItemVideo struct {
 	Title          *string   `db:"title" json:"title" gorm:"column:title"`
 	URL            *string   `db:"url" json:"url" gorm:"column:url"`
 	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemVideo.
@@ -480,6 +487,7 @@ type ReleaseItemWork struct {
 	Work           *string   `db:"work" json:"work" gorm:"column:work"`
 	LabelID        int32     `db:"label_id" json:"label_id" gorm:"column:label_id"`
 	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemWork.

@@ -21,7 +21,7 @@ var entityImportContractRevisions = map[string]int32{
 	"artist":  1,
 	"label":   1,
 	"master":  1,
-	"release": 2,
+	"release": 3,
 }
 
 var entityLockDependencies = map[string][]string{
