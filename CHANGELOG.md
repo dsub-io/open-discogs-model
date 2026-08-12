@@ -1,5 +1,50 @@
 # Changelog
 
+## [0.3.0](https://github.com/dsub-io/open-discogs-model/compare/v0.2.3...v0.3.0) (2026-08-12)
+
+
+### Features
+
+* add a canonical release-import convergence contract ([#49](https://github.com/dsub-io/open-discogs-model/pull/49))
+  * record an explicit import-contract revision per entity (`artist=1`,
+    `label=1`, `master=1`, `release=2`) so Go and Java can distinguish
+    compatible checkpoints from imports created with older release semantics
+  * require `master.main_release_id` to reference a release owned by that same
+    master and prevent one release from being the main release of two masters
+  * clear a stale main-release reference before a release moves to another
+    master, allowing interrupted multi-transaction imports to converge safely
+
+
+### Bug Fixes
+
+* publish a strict legacy Liquibase adoption contract for Java releases
+  `1.0.0` through `1.2.1` ([#49](https://github.com/dsub-io/open-discogs-model/pull/49))
+  * bind V001-V007 history to released changeset identities, canonical SQL
+    hashes, permitted execution states, and PostgreSQL schema fingerprints
+  * fail closed on partial, unknown, or catalog-mismatched histories instead of
+    replaying already-applied schema changes
+* validate the published jOOQ dependency node against the declared Java API
+  version instead of a stale hardcoded version ([#51](https://github.com/dsub-io/open-discogs-model/pull/51))
+* wait for the final PostgreSQL server instead of the temporary initialization
+  server in release contract tests ([#53](https://github.com/dsub-io/open-discogs-model/pull/53))
+
+### Verification
+
+* PostgreSQL 15.13 and 18.4 integration tests cover clean V009 application,
+  rollback on invalid existing relationships, and interrupted A-to-B master
+  reassignment convergence
+* Go race and vet checks, the Gradle Java build, packaged migration inventory,
+  and test-created Docker resource cleanup all passed
+
+### Upgrade notes
+
+* V009 validates existing data while adding unique constraints, a composite
+  foreign key, and a trigger; mismatched or duplicate relationships abort the
+  migration without a partial schema change
+* production-scale index-build duration, lock time, and temporary disk usage
+  have not been measured; operators should measure them on a production-sized
+  copy and schedule a backed-up maintenance window before upgrading
+
 ## [0.2.3](https://github.com/dsub-io/open-discogs-model/compare/v0.2.2...v0.2.3) (2026-08-12)
 
 
