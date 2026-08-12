@@ -5,17 +5,45 @@
 
 ### Features
 
-* add canonical release convergence contract ([68ce9b3](https://github.com/dsub-io/open-discogs-model/commit/68ce9b3a94396b0bcbcbfa0d595b50ebe093fed7))
-* add release convergence contract ([bbe1961](https://github.com/dsub-io/open-discogs-model/commit/bbe19613d8a0b8f2abd96257c39f402a12eff87b))
+* add a canonical release-import convergence contract ([#49](https://github.com/dsub-io/open-discogs-model/pull/49))
+  * record an explicit import-contract revision per entity (`artist=1`,
+    `label=1`, `master=1`, `release=2`) so Go and Java can distinguish
+    compatible checkpoints from imports created with older release semantics
+  * require `master.main_release_id` to reference a release owned by that same
+    master and prevent one release from being the main release of two masters
+  * clear a stale main-release reference before a release moves to another
+    master, allowing interrupted multi-transaction imports to converge safely
 
 
 ### Bug Fixes
 
-* publish legacy migration compatibility ([c640a1f](https://github.com/dsub-io/open-discogs-model/commit/c640a1f8a9bcf435163325c58ceba31a1c17d939))
-* validate published dependency versions dynamically ([62d35ac](https://github.com/dsub-io/open-discogs-model/commit/62d35acf62be7200e6d0fb3a36e8777ecc8ed723))
-* validate published dependency versions dynamically ([22f0bd3](https://github.com/dsub-io/open-discogs-model/commit/22f0bd357c86048ae3e9a0c76b0667d57c0e0c4f))
-* wait for final PostgreSQL test server ([513a28e](https://github.com/dsub-io/open-discogs-model/commit/513a28e7eafefec13b1f6fbbfa617f7eddc72baf))
-* wait for final PostgreSQL test server ([6d58f8b](https://github.com/dsub-io/open-discogs-model/commit/6d58f8b464767778461eef10ddbefb9521887cf4))
+* publish a strict legacy Liquibase adoption contract for Java releases
+  `1.0.0` through `1.2.1` ([#49](https://github.com/dsub-io/open-discogs-model/pull/49))
+  * bind V001-V007 history to released changeset identities, canonical SQL
+    hashes, permitted execution states, and PostgreSQL schema fingerprints
+  * fail closed on partial, unknown, or catalog-mismatched histories instead of
+    replaying already-applied schema changes
+* validate the published jOOQ dependency node against the declared Java API
+  version instead of a stale hardcoded version ([#51](https://github.com/dsub-io/open-discogs-model/pull/51))
+* wait for the final PostgreSQL server instead of the temporary initialization
+  server in release contract tests ([#53](https://github.com/dsub-io/open-discogs-model/pull/53))
+
+### Verification
+
+* PostgreSQL 15.13 and 18.4 integration tests cover clean V009 application,
+  rollback on invalid existing relationships, and interrupted A-to-B master
+  reassignment convergence
+* Go race and vet checks, the Gradle Java build, packaged migration inventory,
+  and test-created Docker resource cleanup all passed
+
+### Upgrade notes
+
+* V009 validates existing data while adding unique constraints, a composite
+  foreign key, and a trigger; mismatched or duplicate relationships abort the
+  migration without a partial schema change
+* production-scale index-build duration, lock time, and temporary disk usage
+  have not been measured; operators should measure them on a production-sized
+  copy and schedule a backed-up maintenance window before upgrading
 
 ## [0.2.3](https://github.com/dsub-io/open-discogs-model/compare/v0.2.2...v0.2.3) (2026-08-12)
 
