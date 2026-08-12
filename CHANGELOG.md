@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/dsub-io/open-discogs-model/compare/v0.2.2...v0.2.3) (2026-08-12)
+
+
+### Bug Fixes
+
+* preserve distinct catalog numbers on repeated release-label credits and verify upgrades from V007 ([#46](https://github.com/dsub-io/open-discogs-model/pull/46))
+
 ## [0.2.2](https://github.com/dsub-io/open-discogs-model/compare/v0.2.1...v0.2.2) (2026-08-11)
 
 
