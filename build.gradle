@@ -115,12 +115,14 @@ def migrationFiles = fileTree('schema/migrations') {
     include '*.sql'
 }.files.sort { left, right -> left.name <=> right.name }
 def combinedSchema = layout.buildDirectory.file('generated-schema/postgresql-init.sql')
+def migrationIndex = layout.buildDirectory.file('generated-schema/migrations/index.txt')
 
 tasks.register('prepareSchema') {
     description = 'Combines ordered PostgreSQL migrations for schema code generation.'
     group = 'build setup'
     inputs.files(migrationFiles)
     outputs.file(combinedSchema)
+    outputs.file(migrationIndex)
     doLast {
         def output = combinedSchema.get().asFile
         output.parentFile.mkdirs()
@@ -131,6 +133,14 @@ tasks.register('prepareSchema') {
                 writer.write('\n')
             }
         }
+        def index = migrationIndex.get().asFile
+        index.parentFile.mkdirs()
+        index.withWriter('UTF-8') { writer ->
+            migrationFiles.each { migration ->
+                writer.write(migration.name)
+                writer.write('\n')
+            }
+        }
     }
 }
 
@@ -138,6 +148,10 @@ tasks.named('processResources') {
     dependsOn(tasks.named('prepareSchema'))
     from(combinedSchema) {
         rename { 'postgresql-init.sql' }
+    }
+    from(migrationIndex) {
+        into 'migrations'
+        rename { 'index.txt' }
     }
 }
 
@@ -280,6 +294,17 @@ tasks.register('validateSchemaResources') {
                 .get().asFile.isFile()) {
             throw new GradleException(
                     'Java resources are missing the generated postgresql-init.sql')
+        }
+        def packagedIndex = layout.buildDirectory
+                .file('resources/main/migrations/index.txt').get().asFile
+        if (!packagedIndex.isFile()) {
+            throw new GradleException(
+                    'Java resources are missing the generated migration index')
+        }
+        def indexedMigrations = packagedIndex.readLines('UTF-8')
+        if (indexedMigrations != migrationFiles*.name) {
+            throw new GradleException(
+                    'Java migration index does not match canonical migrations')
         }
         if (!missingMigrations.isEmpty()) {
             throw new GradleException(

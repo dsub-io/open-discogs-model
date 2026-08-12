@@ -5,6 +5,7 @@ repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 generated_model="$repository_root/model/schema.gen.go"
 before_hash="$(git hash-object "$generated_model")"
 
+"$repository_root/scripts/test-migrations.sh"
 "$repository_root/scripts/generate-go-models.sh"
 after_hash="$(git hash-object "$generated_model")"
 if [[ "$before_hash" != "$after_hash" ]]; then
