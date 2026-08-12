@@ -1,0 +1,397 @@
+{
+  "formatVersion": 1,
+  "contract": "open-discogs-legacy-liquibase/v1",
+  "schemaDefinition": {
+    "name": "legacy-liquibase-v1.schema.json",
+    "sha256": "33df80a1c3832dc71d8c5c43eabbd17f90ec12f949a8e83dc130fe7e342b5bf6"
+  },
+  "liquibaseVersion": "5.0.3",
+  "liquibaseChecksumVersion": 9,
+  "schemaContracts": [
+    {
+      "prefix": "V004",
+      "migrationVersions": [
+        "V001",
+        "V002",
+        "V003",
+        "V004"
+      ],
+      "verifier": {
+        "name": "legacy-schema-fingerprint-v1.sql",
+        "sha256": "a33713235ad9832b378b25761b7bbc3efdd1dd4436c9ad9d87afb18e40960c65"
+      },
+      "expectedFingerprints": [
+        {
+          "postgresMajor": 15,
+          "sha256": "d5f12dac9987e1dacc08da3e4344ea69ea94a33ca7710a199dff746eabbbea13"
+        },
+        {
+          "postgresMajor": 16,
+          "sha256": "d5f12dac9987e1dacc08da3e4344ea69ea94a33ca7710a199dff746eabbbea13"
+        },
+        {
+          "postgresMajor": 17,
+          "sha256": "d5f12dac9987e1dacc08da3e4344ea69ea94a33ca7710a199dff746eabbbea13"
+        },
+        {
+          "postgresMajor": 18,
+          "sha256": "70b2067ac2e903f418d8328b1452d516329c25dc3d5cf22e16793c53cc480b85"
+        }
+      ]
+    },
+    {
+      "prefix": "V006",
+      "migrationVersions": [
+        "V001",
+        "V002",
+        "V003",
+        "V004",
+        "V005",
+        "V006"
+      ],
+      "verifier": {
+        "name": "legacy-schema-fingerprint-v1.sql",
+        "sha256": "a33713235ad9832b378b25761b7bbc3efdd1dd4436c9ad9d87afb18e40960c65"
+      },
+      "expectedFingerprints": [
+        {
+          "postgresMajor": 15,
+          "sha256": "f938441af564ca35be8a250a6bbef067dce516833c678170e41f6716e882abef"
+        },
+        {
+          "postgresMajor": 16,
+          "sha256": "f938441af564ca35be8a250a6bbef067dce516833c678170e41f6716e882abef"
+        },
+        {
+          "postgresMajor": 17,
+          "sha256": "f938441af564ca35be8a250a6bbef067dce516833c678170e41f6716e882abef"
+        },
+        {
+          "postgresMajor": 18,
+          "sha256": "ee13b6c63977044ca11eeae68473cc6f224d28069cf34357b18e824ba0cf8b38"
+        }
+      ]
+    },
+    {
+      "prefix": "V007",
+      "migrationVersions": [
+        "V001",
+        "V002",
+        "V003",
+        "V004",
+        "V005",
+        "V006",
+        "V007"
+      ],
+      "verifier": {
+        "name": "legacy-schema-fingerprint-v1.sql",
+        "sha256": "a33713235ad9832b378b25761b7bbc3efdd1dd4436c9ad9d87afb18e40960c65"
+      },
+      "expectedFingerprints": [
+        {
+          "postgresMajor": 15,
+          "sha256": "caf5eb22e8d534ee6b137bb411e40c90c5059f0b9031f6bd523a737b4270deca"
+        },
+        {
+          "postgresMajor": 16,
+          "sha256": "caf5eb22e8d534ee6b137bb411e40c90c5059f0b9031f6bd523a737b4270deca"
+        },
+        {
+          "postgresMajor": 17,
+          "sha256": "caf5eb22e8d534ee6b137bb411e40c90c5059f0b9031f6bd523a737b4270deca"
+        },
+        {
+          "postgresMajor": 18,
+          "sha256": "833cdf351ec53874c1cc244578e3aac2e0b87bcb68f8228b0d4286977d190d13"
+        }
+      ]
+    }
+  ],
+  "migrations": [
+    {
+      "version": "V001",
+      "canonicalFilename": "V001__initial_schema.sql",
+      "canonicalSha256": "c84f92887d4d22dfbdb34645d1e50abb9ea28fe663531accb7eb764756fb23f0",
+      "legacyChangeSets": [
+        {
+          "schemaMode": "PUBLIC",
+          "id": "open-discogs-model-v001",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-master.xml",
+          "checksumPolicy": "EXACT",
+          "checksum": "9:21b43c01c07539940ef584360151932e",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "EXACT_CHECKSUM"
+            },
+            {
+              "executionType": "MARK_RAN",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            }
+          ]
+        },
+        {
+          "schemaMode": "CUSTOM",
+          "id": "open-discogs-model-v001",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-custom-schema.xml",
+          "checksumPolicy": "SCHEMA_PARAMETERIZED",
+          "schemaParameter": "databaseSchema",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            },
+            {
+              "executionType": "MARK_RAN",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "V002",
+      "canonicalFilename": "V002__discogs_dump_catalog.sql",
+      "canonicalSha256": "8c189a02f22275868432f87d2858551894b264ff2e3aef0f5757a6ad7fb2ad44",
+      "legacyChangeSets": [
+        {
+          "schemaMode": "PUBLIC",
+          "id": "open-discogs-model-v002",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-master.xml",
+          "checksumPolicy": "EXACT",
+          "checksum": "9:1fe2b5ca5132d441129f7734864389bb",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "EXACT_CHECKSUM"
+            },
+            {
+              "executionType": "MARK_RAN",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            }
+          ]
+        },
+        {
+          "schemaMode": "CUSTOM",
+          "id": "open-discogs-model-v002",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-custom-schema.xml",
+          "checksumPolicy": "SCHEMA_PARAMETERIZED",
+          "schemaParameter": "databaseSchema",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            },
+            {
+              "executionType": "MARK_RAN",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "V003",
+      "canonicalFilename": "V003__discogs_import_history.sql",
+      "canonicalSha256": "8d7befa1ad26771a863413dd341be2eeff1eaa1ae9a4de4088253a18a5fe4620",
+      "legacyChangeSets": [
+        {
+          "schemaMode": "PUBLIC",
+          "id": "open-discogs-model-v003",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-master.xml",
+          "checksumPolicy": "EXACT",
+          "checksum": "9:b9d40e8e8cb0f59b0d15e764f7af4070",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "EXACT_CHECKSUM"
+            },
+            {
+              "executionType": "MARK_RAN",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            }
+          ]
+        },
+        {
+          "schemaMode": "CUSTOM",
+          "id": "open-discogs-model-v003",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-custom-schema.xml",
+          "checksumPolicy": "SCHEMA_PARAMETERIZED",
+          "schemaParameter": "databaseSchema",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            },
+            {
+              "executionType": "MARK_RAN",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "V004",
+      "canonicalFilename": "V004__allow_reissued_dump_paths.sql",
+      "canonicalSha256": "b73b183c7ef8495d711abbd72aa98a130f0fcb98afbe8e5e82e052278100ff0e",
+      "legacyChangeSets": [
+        {
+          "schemaMode": "PUBLIC",
+          "id": "open-discogs-model-v004",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-master.xml",
+          "checksumPolicy": "EXACT",
+          "checksum": "9:c500950a7ae85ad47ea9ba14c857df39",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "EXACT_CHECKSUM"
+            }
+          ]
+        },
+        {
+          "schemaMode": "CUSTOM",
+          "id": "open-discogs-model-v004",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-custom-schema.xml",
+          "checksumPolicy": "SCHEMA_PARAMETERIZED",
+          "schemaParameter": "databaseSchema",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "V005",
+      "canonicalFilename": "V005__durable_import_progress.sql",
+      "canonicalSha256": "a9784e437a0ebaf6c9b5bd93388e5a8f53ecedc53f97c714154265a78617f5cb",
+      "legacyChangeSets": [
+        {
+          "schemaMode": "PUBLIC",
+          "id": "open-discogs-model-v005",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-master.xml",
+          "checksumPolicy": "EXACT",
+          "checksum": "9:363a63d36fadeea4d0dc435601398341",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "EXACT_CHECKSUM"
+            },
+            {
+              "executionType": "MARK_RAN",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            }
+          ]
+        },
+        {
+          "schemaMode": "CUSTOM",
+          "id": "open-discogs-model-v005",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-custom-schema.xml",
+          "checksumPolicy": "SCHEMA_PARAMETERIZED",
+          "schemaParameter": "databaseSchema",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            },
+            {
+              "executionType": "MARK_RAN",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "V006",
+      "canonicalFilename": "V006__concurrent_import_progress.sql",
+      "canonicalSha256": "d1568b6a934bcdc50cfab590c18fc18fedda661c01aefac24cd7d7c149561f45",
+      "legacyChangeSets": [
+        {
+          "schemaMode": "PUBLIC",
+          "id": "open-discogs-model-v006",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-master.xml",
+          "checksumPolicy": "EXACT",
+          "checksum": "9:c89cf57ca3b13c733e9db92d2c2935a8",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "EXACT_CHECKSUM"
+            },
+            {
+              "executionType": "MARK_RAN",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            }
+          ]
+        },
+        {
+          "schemaMode": "CUSTOM",
+          "id": "open-discogs-model-v006",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-custom-schema.xml",
+          "checksumPolicy": "SCHEMA_PARAMETERIZED",
+          "schemaParameter": "databaseSchema",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            },
+            {
+              "executionType": "MARK_RAN",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "V007",
+      "canonicalFilename": "V007__api_query_indexes.sql",
+      "canonicalSha256": "92bf45c9b01da04026ab2a0850136cc953262bda99b41f9a64324d3a4a201fc7",
+      "legacyChangeSets": [
+        {
+          "schemaMode": "PUBLIC",
+          "id": "open-discogs-model-v007",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-master.xml",
+          "checksumPolicy": "EXACT",
+          "checksum": "9:f60af7da668a40343f647837995b87ec",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "EXACT_CHECKSUM"
+            }
+          ]
+        },
+        {
+          "schemaMode": "CUSTOM",
+          "id": "open-discogs-model-v007",
+          "author": "state303",
+          "filename": "db/changelog/db.changelog-custom-schema.xml",
+          "checksumPolicy": "SCHEMA_PARAMETERIZED",
+          "schemaParameter": "databaseSchema",
+          "executionPolicies": [
+            {
+              "executionType": "EXECUTED",
+              "adoptionProof": "SCHEMA_CONTRACT"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

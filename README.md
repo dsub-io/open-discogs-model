@@ -61,9 +61,32 @@ migrations, err := schema.Migrations()
 Files under `schema/migrations` are the only hand-maintained database schema
 source. The Java jOOQ classes and Go structs are generated from a PostgreSQL
 database created from those ordered migrations.
-The Java artifact also contains a generated `migrations/index.txt`; JVM
-consumers use that inventory and the packaged SQL instead of maintaining
-consumer-owned migration copies.
+The Java artifact contains a generated migration inventory and byte-identical
+SQL under `io/dsub/opendiscogs/schema/migrations`. JVM consumers use that
+namespaced inventory instead of maintaining consumer-owned migration copies.
+The legacy `migrations` resource path remains packaged only for compatibility
+with released Liquibase consumers.
+
+Canonical migrations require PostgreSQL 15 or newer. Consumers calculate
+checksums from the original packaged SQL bytes and only then scope canonical
+`public` references to an operator-selected schema.
+
+### Legacy Liquibase compatibility
+
+The model owns a strict
+[`legacy-liquibase-v1`](schema/contracts/legacy-liquibase-v1.md) contract for
+adopting Java Batch `1.0.0` through `1.2.1` Liquibase history into the shared
+canonical migration ledger. The Go `schema.LegacyLiquibaseCompatibility` API
+validates its typed manifest against the packaged V001-V007 SQL inventory and
+contract resources.
+
+Public `EXECUTED` history requires the exact released Liquibase checksum.
+Custom-schema checksums depend on the configured schema name, and permitted
+`MARK_RAN` rows do not prove that SQL executed. Those cases require the
+model-owned PostgreSQL catalog fingerprint for the complete V004, V006, or V007
+historical prefix before any canonical ledger rows are adopted. Unknown
+PostgreSQL majors, partial histories, duplicate identities, and fingerprint
+mismatches fail closed.
 
 The schema includes the OpenDiscogs catalog tables, immutable dump provenance,
 append-only import-run identity, and bounded progress that becomes historical
@@ -74,6 +97,11 @@ The [`import-progress-v1`](schema/contracts/import-progress-v1.md) contract
 keeps one summary row per selected entity and a resumable chunk ledger. The
 ledger supports parallel commits without treating gaps as completed work and
 may be pruned once a successful run no longer needs it.
+Each `discogs_import_run_dump` row also records the entity-specific import
+contract revision. Successful checkpoints are reusable across Java and Go only
+at the current entity revision; interrupted runs additionally require the same
+processor name and version. V009 preserves existing rows at revision `1` and
+sets the current contract to `artist=1`, `label=1`, `master=1`, and `release=2`.
 Application-specific Spring Batch metadata and query logic do not belong to
 this module.
 
@@ -110,6 +138,13 @@ catalog number. A release may list the same label more than once with distinct
 catalog-number spelling, and every spelling is preserved. PostgreSQL treats a
 missing catalog number as one identity value so repeated `NULL` entries do not
 create duplicate relations.
+
+A master can name only a release that belongs to that same master as its main
+release, and one release cannot be the main release of multiple masters. V009
+validates existing data before adding these constraints; it does not silently
+repair conflicts. Creating the supporting unique indexes on a populated
+production database requires a measured maintenance window and sufficient
+temporary disk capacity.
 
 ## Development
 
