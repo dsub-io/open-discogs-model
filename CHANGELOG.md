@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.3](https://github.com/dsub-io/open-discogs-model/compare/v0.2.2...v0.2.3) (2026-08-12)
+
+
+### Bug Fixes
+
+* preserve release label catalog identities ([a135cf2](https://github.com/dsub-io/open-discogs-model/commit/a135cf259c2d6290f70d5f5aafbf5a91d02c37a9))
+* preserve release label catalog identities ([ef46296](https://github.com/dsub-io/open-discogs-model/commit/ef46296169fe8bdc6558e1fb5ea1103d9950b25b))
+
 ## [0.2.2](https://github.com/dsub-io/open-discogs-model/compare/v0.2.1...v0.2.2) (2026-08-11)
 
 
