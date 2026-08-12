@@ -91,10 +91,13 @@ trap 'exit 143' TERM
 wait_for_postgres() {
   local container_name=$1
 
-  for _ in {1..30}; do
-    if docker exec "$container_name" \
-      psql --username postgres --dbname postgres \
-      --no-psqlrc --tuples-only --command 'select 1' >/dev/null 2>&1; then
+  # The temporary init server accepts SQL before the entrypoint starts the final PID 1 server.
+  for _ in {1..60}; do
+    if docker exec "$container_name" sh -ceu '
+      test "$(cat /proc/1/comm)" = postgres
+      exec psql --username postgres --dbname postgres \
+        --no-psqlrc --tuples-only --command "select 1"
+    ' >/dev/null 2>&1; then
       return 0
     fi
     sleep 1
