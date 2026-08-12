@@ -194,6 +194,9 @@ jobs:
           scripts/verify-generated-models.sh
           go test ./...
 
+      - name: Verify release convergence on supported PostgreSQL versions
+        run: scripts/test-release-convergence-contract.sh
+
       - name: Build Maven Central artifacts
         shell: bash
         env:
@@ -204,6 +207,83 @@ jobs:
             -PreleaseVersion="$RELEASE_VERSION" \
             --no-daemon \
             --warning-mode=fail
+
+      - name: Verify packaged schema resource inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t model_jars < <(
+            find build/libs -maxdepth 1 -type f -name '*.jar' \
+              ! -name '*-sources.jar' \
+              ! -name '*-javadoc.jar' \
+              -print
+          )
+          if (( ${#model_jars[@]} != 1 )); then
+            echo "::error::Expected exactly one model JAR, found ${#model_jars[@]}."
+            exit 1
+          fi
+
+          model_jar="${model_jars[0]}"
+          expected_inventory="$(mktemp)"
+          actual_inventory="$(mktemp)"
+          expected_index="$(mktemp)"
+          trap 'rm -f "$expected_inventory" "$actual_inventory" "$expected_index"' EXIT
+
+          find schema/migrations -maxdepth 1 -type f -name 'V*.sql' \
+            -printf '%f\n' | LC_ALL=C sort > "$expected_index"
+          if [[ ! -s "$expected_index" ]]; then
+            echo '::error::Canonical migration inventory is empty.'
+            exit 1
+          fi
+
+          {
+            echo postgresql-init.sql
+            echo migrations/index.txt
+            echo io/dsub/opendiscogs/schema/migrations/index.txt
+            while IFS= read -r migration_name; do
+              echo "migrations/$migration_name"
+              echo "io/dsub/opendiscogs/schema/migrations/$migration_name"
+            done < "$expected_index"
+            find schema/contracts -type f -printf '%P\n' | LC_ALL=C sort |
+              while IFS= read -r contract_name; do
+                echo "contracts/$contract_name"
+                echo "io/dsub/opendiscogs/schema/contracts/$contract_name"
+              done
+          } | LC_ALL=C sort > "$expected_inventory"
+
+          jar --list --file "$model_jar" |
+            awk '
+              $0 == "postgresql-init.sql" ||
+              $0 == "migrations/index.txt" ||
+              $0 == "io/dsub/opendiscogs/schema/migrations/index.txt" ||
+              $0 ~ /^migrations\/V[0-9][0-9][0-9]__[a-z0-9_]+\.sql$/ ||
+              $0 ~ /^io\/dsub\/opendiscogs\/schema\/migrations\/V[0-9][0-9][0-9]__[a-z0-9_]+\.sql$/ ||
+              $0 ~ /^contracts\/[^/].*$/ ||
+              $0 ~ /^io\/dsub\/opendiscogs\/schema\/contracts\/[^/].*$/
+            ' | LC_ALL=C sort > "$actual_inventory"
+          diff --unified "$expected_inventory" "$actual_inventory"
+
+          unzip -p "$model_jar" migrations/index.txt | cmp - "$expected_index"
+          unzip -p "$model_jar" \
+            io/dsub/opendiscogs/schema/migrations/index.txt |
+            cmp - "$expected_index"
+
+          while IFS= read -r migration_name; do
+            unzip -p "$model_jar" "migrations/$migration_name" |
+              cmp - "schema/migrations/$migration_name"
+            unzip -p "$model_jar" \
+              "io/dsub/opendiscogs/schema/migrations/$migration_name" |
+              cmp - "schema/migrations/$migration_name"
+          done < "$expected_index"
+
+          while IFS= read -r contract_path; do
+            unzip -p "$model_jar" "contracts/$contract_path" |
+              cmp - "schema/contracts/$contract_path"
+            unzip -p "$model_jar" \
+              "io/dsub/opendiscogs/schema/contracts/$contract_path" |
+              cmp - "schema/contracts/$contract_path"
+          done < <(find schema/contracts -type f -printf '%P\n' | LC_ALL=C sort)
 
       - name: Sign and package Maven Central bundle
         id: bundle
