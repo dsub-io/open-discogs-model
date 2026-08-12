@@ -27,6 +27,7 @@ func TestMigrations(t *testing.T) {
 		"V006__concurrent_import_progress.sql",
 		"V007__api_query_indexes.sql",
 		"V008__label_release_catalog_identity.sql",
+		"V009__release_convergence_contract.sql",
 	}
 	if len(entries) != len(want) {
 		t.Fatalf("migration count = %d, want %d", len(entries), len(want))
