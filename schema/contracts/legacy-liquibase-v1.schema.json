@@ -1,0 +1,283 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dsub-io/open-discogs-model/schema/contracts/legacy-liquibase-v1.schema.json",
+  "title": "OpenDiscogs legacy Liquibase compatibility manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "formatVersion",
+    "contract",
+    "schemaDefinition",
+    "liquibaseVersion",
+    "liquibaseChecksumVersion",
+    "schemaContracts",
+    "migrations"
+  ],
+  "properties": {
+    "formatVersion": {
+      "const": 1
+    },
+    "contract": {
+      "const": "open-discogs-legacy-liquibase/v1"
+    },
+    "schemaDefinition": {
+      "$ref": "#/$defs/resource"
+    },
+    "liquibaseVersion": {
+      "const": "5.0.3"
+    },
+    "liquibaseChecksumVersion": {
+      "const": 9
+    },
+    "schemaContracts": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/schemaContract"
+      }
+    },
+    "migrations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/migration"
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "migrationVersion": {
+      "type": "string",
+      "pattern": "^V[0-9]{3}$"
+    },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "sha256"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "schemaFingerprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "postgresMajor",
+        "sha256"
+      ],
+      "properties": {
+        "postgresMajor": {
+          "type": "integer",
+          "minimum": 15,
+          "maximum": 18
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "schemaContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prefix",
+        "migrationVersions",
+        "verifier",
+        "expectedFingerprints"
+      ],
+      "properties": {
+        "prefix": {
+          "$ref": "#/$defs/migrationVersion"
+        },
+        "migrationVersions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/migrationVersion"
+          }
+        },
+        "verifier": {
+          "$ref": "#/$defs/resource"
+        },
+        "expectedFingerprints": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/schemaFingerprint"
+          }
+        }
+      }
+    },
+    "executionPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executionType",
+        "adoptionProof"
+      ],
+      "properties": {
+        "executionType": {
+          "enum": [
+            "EXECUTED",
+            "MARK_RAN"
+          ]
+        },
+        "adoptionProof": {
+          "enum": [
+            "EXACT_CHECKSUM",
+            "SCHEMA_CONTRACT"
+          ]
+        }
+      }
+    },
+    "legacyChangeSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaMode",
+        "id",
+        "author",
+        "filename",
+        "checksumPolicy",
+        "executionPolicies"
+      ],
+      "properties": {
+        "schemaMode": {
+          "enum": [
+            "PUBLIC",
+            "CUSTOM"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^open-discogs-model-v[0-9]{3}$"
+        },
+        "author": {
+          "const": "state303"
+        },
+        "filename": {
+          "enum": [
+            "db/changelog/db.changelog-master.xml",
+            "db/changelog/db.changelog-custom-schema.xml"
+          ]
+        },
+        "checksumPolicy": {
+          "enum": [
+            "EXACT",
+            "SCHEMA_PARAMETERIZED"
+          ]
+        },
+        "checksum": {
+          "type": "string",
+          "pattern": "^9:[0-9a-f]{32}$"
+        },
+        "schemaParameter": {
+          "type": "string",
+          "const": "databaseSchema"
+        },
+        "executionPolicies": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/executionPolicy"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "checksumPolicy": {
+                "const": "EXACT"
+              }
+            },
+            "required": [
+              "checksumPolicy"
+            ]
+          },
+          "then": {
+            "required": [
+              "checksum"
+            ],
+            "not": {
+              "required": [
+                "schemaParameter"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "checksumPolicy": {
+                "const": "SCHEMA_PARAMETERIZED"
+              }
+            },
+            "required": [
+              "checksumPolicy"
+            ]
+          },
+          "then": {
+            "required": [
+              "schemaParameter"
+            ],
+            "not": {
+              "required": [
+                "checksum"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "canonicalFilename",
+        "canonicalSha256",
+        "legacyChangeSets"
+      ],
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/migrationVersion"
+        },
+        "canonicalFilename": {
+          "type": "string",
+          "pattern": "^V[0-9]{3}__[a-z0-9_]+\\.sql$"
+        },
+        "canonicalSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "legacyChangeSets": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/legacyChangeSet"
+          }
+        }
+      }
+    }
+  }
+}

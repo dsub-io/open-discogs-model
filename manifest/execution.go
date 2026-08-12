@@ -17,6 +17,13 @@ var entityLockKeys = map[string]int32{
 	"release": 4,
 }
 
+var entityImportContractRevisions = map[string]int32{
+	"artist":  1,
+	"label":   1,
+	"master":  1,
+	"release": 2,
+}
+
 var entityLockDependencies = map[string][]string{
 	"artist":  {"artist"},
 	"label":   {"label"},
@@ -31,6 +38,17 @@ func EntityLockKey(entityType string) (int32, error) {
 		return 0, fmt.Errorf("unknown entity type %q", entityType)
 	}
 	return key, nil
+}
+
+// ImportContractRevision returns the current stored-data semantics revision for an entity.
+// Successful checkpoints are compatible across processors only at this revision; interrupted
+// runs still require an exact processor name and version match.
+func ImportContractRevision(entityType string) (int32, error) {
+	revision, found := entityImportContractRevisions[strings.ToLower(entityType)]
+	if !found {
+		return 0, fmt.Errorf("unknown entity type %q", entityType)
+	}
+	return revision, nil
 }
 
 // OrderedEntityTypes validates, de-duplicates, and sorts entity types before lock acquisition.

@@ -116,6 +116,11 @@ def migrationFiles = fileTree('schema/migrations') {
 }.files.sort { left, right -> left.name <=> right.name }
 def combinedSchema = layout.buildDirectory.file('generated-schema/postgresql-init.sql')
 def migrationIndex = layout.buildDirectory.file('generated-schema/migrations/index.txt')
+def namespacedMigrationDirectory = 'io/dsub/opendiscogs/schema/migrations'
+def namespacedContractDirectory = 'io/dsub/opendiscogs/schema/contracts'
+def schemaContractFiles = fileTree('schema/contracts') {
+    include '**/*'
+}
 
 tasks.register('prepareSchema') {
     description = 'Combines ordered PostgreSQL migrations for schema code generation.'
@@ -152,6 +157,16 @@ tasks.named('processResources') {
     from(migrationIndex) {
         into 'migrations'
         rename { 'index.txt' }
+    }
+    from(migrationFiles) {
+        into namespacedMigrationDirectory
+    }
+    from(migrationIndex) {
+        into namespacedMigrationDirectory
+        rename { 'index.txt' }
+    }
+    from(schemaContractFiles) {
+        into namespacedContractDirectory
     }
 }
 
@@ -281,35 +296,76 @@ check.dependsOn(tasks.named('validateGeneratedSchema'))
 check.dependsOn(tasks.named('validatePublicationPom'))
 
 tasks.register('validateSchemaResources') {
-    description = 'Checks the Java artifact ships every canonical schema migration.'
+    description = 'Checks generic and namespaced Java migration resources match canonical SQL.'
     group = 'verification'
     dependsOn(tasks.named('processResources'))
     inputs.files(migrationFiles)
+    inputs.files(schemaContractFiles)
     doLast {
-        def missingMigrations = migrationFiles.findAll {
-            !layout.buildDirectory.file("resources/main/migrations/${it.name}")
-                    .get().asFile.isFile()
+        def migrationNames = migrationFiles*.name
+        if (migrationNames.isEmpty()) {
+            throw new GradleException('Canonical migration inventory must not be empty')
+        }
+        def invalidNames = migrationNames.findAll {
+            !(it ==~ /V\d{3}__[a-z0-9_]+\.sql/)
+        }
+        if (!invalidNames.isEmpty()) {
+            throw new GradleException(
+                    "Canonical migration names are invalid:\n - "
+                            + invalidNames.join('\n - '))
+        }
+        def versions = migrationNames.collect {
+            Integer.parseInt(it.substring(1, 4))
+        }
+        def expectedVersions = (1..migrationNames.size()).toList()
+        if (versions != expectedVersions) {
+            throw new GradleException(
+                    "Canonical migration versions must be contiguous: " + versions)
         }
         if (!layout.buildDirectory.file('resources/main/postgresql-init.sql')
                 .get().asFile.isFile()) {
             throw new GradleException(
                     'Java resources are missing the generated postgresql-init.sql')
         }
-        def packagedIndex = layout.buildDirectory
-                .file('resources/main/migrations/index.txt').get().asFile
-        if (!packagedIndex.isFile()) {
-            throw new GradleException(
-                    'Java resources are missing the generated migration index')
+        ['migrations', namespacedMigrationDirectory].each { resourceDirectory ->
+            def packagedIndex = layout.buildDirectory
+                    .file("resources/main/${resourceDirectory}/index.txt").get().asFile
+            if (!packagedIndex.isFile()) {
+                throw new GradleException(
+                        "Java resources are missing ${resourceDirectory}/index.txt")
+            }
+            def indexedMigrations = packagedIndex.readLines('UTF-8')
+            if (indexedMigrations != migrationNames
+                    || indexedMigrations.toSet().size() != indexedMigrations.size()) {
+                throw new GradleException(
+                        "Java migration index is incomplete or duplicated: ${resourceDirectory}")
+            }
+            migrationFiles.each { sourceMigration ->
+                def packagedMigration = layout.buildDirectory
+                        .file("resources/main/${resourceDirectory}/${sourceMigration.name}")
+                        .get().asFile
+                if (!packagedMigration.isFile()
+                        || !java.util.Arrays.equals(
+                                sourceMigration.bytes, packagedMigration.bytes)) {
+                    throw new GradleException(
+                            "Java migration resource differs from canonical SQL: "
+                                    + "${resourceDirectory}/${sourceMigration.name}")
+                }
+            }
         }
-        def indexedMigrations = packagedIndex.readLines('UTF-8')
-        if (indexedMigrations != migrationFiles*.name) {
-            throw new GradleException(
-                    'Java migration index does not match canonical migrations')
-        }
-        if (!missingMigrations.isEmpty()) {
-            throw new GradleException(
-                    "Java resources are missing schema migrations:\n - "
-                            + missingMigrations*.name.join('\n - '))
+        schemaContractFiles.each { sourceContract ->
+            def relativePath = file('schema/contracts').toPath()
+                    .relativize(sourceContract.toPath()).toString()
+            def packagedContract = layout.buildDirectory
+                    .file("resources/main/${namespacedContractDirectory}/${relativePath}")
+                    .get().asFile
+            if (!packagedContract.isFile()
+                    || !java.util.Arrays.equals(
+                            sourceContract.bytes, packagedContract.bytes)) {
+                throw new GradleException(
+                        'Namespaced Java contract resource differs from canonical source: '
+                                + relativePath)
+            }
         }
     }
 }

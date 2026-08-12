@@ -185,15 +185,16 @@ func (DiscogsImportRunChunk) TableName() string { return "discogs_import_run_chu
 
 // DiscogsImportRunDump represents a row in discogs_import_run_dump.
 type DiscogsImportRunDump struct {
-	ImportRunID    int64      `db:"import_run_id" json:"import_run_id" gorm:"column:import_run_id;primaryKey"`
-	EntityType     string     `db:"entity_type" json:"entity_type" gorm:"column:entity_type;primaryKey"`
-	DumpID         int64      `db:"dump_id" json:"dump_id" gorm:"column:dump_id"`
-	ProcessedItems int64      `db:"processed_items" json:"processed_items" gorm:"column:processed_items"`
-	LastProgressAt *time.Time `db:"last_progress_at" json:"last_progress_at" gorm:"column:last_progress_at"`
-	CompletedAt    *time.Time `db:"completed_at" json:"completed_at" gorm:"column:completed_at"`
-	ChunkSize      *int64     `db:"chunk_size" json:"chunk_size" gorm:"column:chunk_size"`
-	TotalItems     *int64     `db:"total_items" json:"total_items" gorm:"column:total_items"`
-	TotalChunks    *int64     `db:"total_chunks" json:"total_chunks" gorm:"column:total_chunks"`
+	ImportRunID            int64      `db:"import_run_id" json:"import_run_id" gorm:"column:import_run_id;primaryKey"`
+	EntityType             string     `db:"entity_type" json:"entity_type" gorm:"column:entity_type;primaryKey"`
+	DumpID                 int64      `db:"dump_id" json:"dump_id" gorm:"column:dump_id"`
+	ProcessedItems         int64      `db:"processed_items" json:"processed_items" gorm:"column:processed_items"`
+	LastProgressAt         *time.Time `db:"last_progress_at" json:"last_progress_at" gorm:"column:last_progress_at"`
+	CompletedAt            *time.Time `db:"completed_at" json:"completed_at" gorm:"column:completed_at"`
+	ChunkSize              *int64     `db:"chunk_size" json:"chunk_size" gorm:"column:chunk_size"`
+	TotalItems             *int64     `db:"total_items" json:"total_items" gorm:"column:total_items"`
+	TotalChunks            *int64     `db:"total_chunks" json:"total_chunks" gorm:"column:total_chunks"`
+	ImportContractRevision int32      `db:"import_contract_revision" json:"import_contract_revision" gorm:"column:import_contract_revision"`
 }
 
 // TableName returns the PostgreSQL table represented by DiscogsImportRunDump.

@@ -30,6 +30,31 @@ func TestOrderedEntityTypesAndLockKeys(t *testing.T) {
 	}
 }
 
+func TestImportContractRevision(t *testing.T) {
+	t.Parallel()
+
+	want := map[string]int32{"artist": 1, "label": 1, "master": 1, "release": 2}
+	for entityType, expected := range want {
+		revision, err := ImportContractRevision(entityType)
+		if err != nil {
+			t.Fatalf("ImportContractRevision(%q) error = %v", entityType, err)
+		}
+		if revision != expected {
+			t.Errorf("ImportContractRevision(%q) = %d, want %d", entityType, revision, expected)
+		}
+		if revision <= 0 {
+			t.Errorf("ImportContractRevision(%q) = %d, want positive", entityType, revision)
+		}
+	}
+	revision, err := ImportContractRevision("RELEASE")
+	if err != nil || revision != want["release"] {
+		t.Fatalf("ImportContractRevision uppercase = %d, %v", revision, err)
+	}
+	if _, err := ImportContractRevision("unknown"); err == nil {
+		t.Fatal("ImportContractRevision(unknown) error = nil")
+	}
+}
+
 func TestRequiredLockEntityTypes(t *testing.T) {
 	t.Parallel()
 

@@ -19,6 +19,8 @@ public final class ImportExecution {
 
   private static final Map<String, Integer> ENTITY_LOCK_KEYS =
       Map.of("artist", 1, "label", 2, "master", 3, "release", 4);
+  private static final Map<String, Integer> ENTITY_IMPORT_CONTRACT_REVISIONS =
+      Map.of("artist", 1, "label", 1, "master", 1, "release", 2);
   private static final Map<String, List<String>> ENTITY_LOCK_DEPENDENCIES =
       Map.of(
           "artist", List.of("artist"),
@@ -33,14 +35,25 @@ public final class ImportExecution {
    * Returns the stable second PostgreSQL advisory lock key for an entity type.
    */
   public static int entityLockKey(String entityType) {
-    if (entityType == null) {
-      throw new IllegalArgumentException("entity type must not be null");
-    }
-    Integer key = ENTITY_LOCK_KEYS.get(entityType.toLowerCase(Locale.ROOT));
+    Integer key = ENTITY_LOCK_KEYS.get(normalizeEntityType(entityType));
     if (key == null) {
       throw new IllegalArgumentException("unknown entity type " + entityType);
     }
     return key;
+  }
+
+  /**
+   * Returns the current stored-data semantics revision for an entity. Successful checkpoints are
+   * compatible across processors only at this revision; interrupted runs still require an exact
+   * processor name and version match.
+   */
+  public static int importContractRevision(String entityType) {
+    String normalized = normalizeEntityType(entityType);
+    Integer revision = ENTITY_IMPORT_CONTRACT_REVISIONS.get(normalized);
+    if (revision == null) {
+      throw new IllegalArgumentException("unknown entity type: " + entityType);
+    }
+    return revision;
   }
 
   /**
@@ -79,5 +92,12 @@ public final class ImportExecution {
       throw new IllegalArgumentException("candidate and checkpoint dates must not be null");
     }
     return candidate.isBefore(checkpoint);
+  }
+
+  private static String normalizeEntityType(String entityType) {
+    if (entityType == null) {
+      throw new IllegalArgumentException("entity type must not be null");
+    }
+    return entityType.toLowerCase(Locale.ROOT);
   }
 }
