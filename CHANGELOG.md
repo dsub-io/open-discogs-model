@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.3.0](https://github.com/dsub-io/open-discogs-model/compare/v0.2.3...v0.3.0) (2026-08-12)
+
+
+### Features
+
+* add canonical release convergence contract ([68ce9b3](https://github.com/dsub-io/open-discogs-model/commit/68ce9b3a94396b0bcbcbfa0d595b50ebe093fed7))
+* add release convergence contract ([bbe1961](https://github.com/dsub-io/open-discogs-model/commit/bbe19613d8a0b8f2abd96257c39f402a12eff87b))
+
+
+### Bug Fixes
+
+* publish legacy migration compatibility ([c640a1f](https://github.com/dsub-io/open-discogs-model/commit/c640a1f8a9bcf435163325c58ceba31a1c17d939))
+* validate published dependency versions dynamically ([62d35ac](https://github.com/dsub-io/open-discogs-model/commit/62d35acf62be7200e6d0fb3a36e8777ecc8ed723))
+* validate published dependency versions dynamically ([22f0bd3](https://github.com/dsub-io/open-discogs-model/commit/22f0bd357c86048ae3e9a0c76b0667d57c0e0c4f))
+* wait for final PostgreSQL test server ([513a28e](https://github.com/dsub-io/open-discogs-model/commit/513a28e7eafefec13b1f6fbbfa617f7eddc72baf))
+* wait for final PostgreSQL test server ([6d58f8b](https://github.com/dsub-io/open-discogs-model/commit/6d58f8b464767778461eef10ddbefb9521887cf4))
+
 ## [0.2.3](https://github.com/dsub-io/open-discogs-model/compare/v0.2.2...v0.2.3) (2026-08-12)
 
 
