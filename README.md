@@ -61,6 +61,9 @@ migrations, err := schema.Migrations()
 Files under `schema/migrations` are the only hand-maintained database schema
 source. The Java jOOQ classes and Go structs are generated from a PostgreSQL
 database created from those ordered migrations.
+The Java artifact also contains a generated `migrations/index.txt`; JVM
+consumers use that inventory and the packaged SQL instead of maintaining
+consumer-owned migration copies.
 
 The schema includes the OpenDiscogs catalog tables, immutable dump provenance,
 append-only import-run identity, and bounded progress that becomes historical
@@ -101,6 +104,12 @@ serving traffic so the planner sees the imported data distribution.
 The reproducible synthetic before/after results and their full-dump limitations
 are recorded in
 [`docs/performance/2026-08-11-api-query-indexes.md`](docs/performance/2026-08-11-api-query-indexes.md).
+
+`label_release_item` identifies a Discogs label credit by release, label, and
+catalog number. A release may list the same label more than once with distinct
+catalog-number spelling, and every spelling is preserved. PostgreSQL treats a
+missing catalog number as one identity value so repeated `NULL` entries do not
+create duplicate relations.
 
 ## Development
 
