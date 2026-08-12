@@ -272,14 +272,14 @@ tasks.register('validatePublicationPom') {
     dependsOn(tasks.named('generatePomFileForMavenJavaPublication'))
     inputs.file(publicationPom)
     doLast {
-        def pomText = publicationPom.get().asFile.getText('UTF-8')
+        def pomFile = publicationPom.get().asFile
+        def pomText = pomFile.getText('UTF-8')
         def requiredFragments = [
                 '<groupId>io.dsub.opendiscogs</groupId>',
                 '<artifactId>open-discogs-model-jooq</artifactId>',
                 '<name>state303</name>',
                 '<groupId>org.jooq</groupId>',
-                '<artifactId>jooq</artifactId>',
-                '<version>3.21.6</version>'
+                '<artifactId>jooq</artifactId>'
         ]
         def missingFragments = requiredFragments.findAll {
             !pomText.contains(it)
@@ -288,6 +288,30 @@ tasks.register('validatePublicationPom') {
             throw new GradleException(
                     "Publication POM is missing required metadata:\n - "
                             + missingFragments.join('\n - '))
+        }
+
+        def declaredJooqDependency = configurations.api.dependencies.find {
+            it.group == 'org.jooq' && it.name == 'jooq'
+        }
+        if (declaredJooqDependency == null || declaredJooqDependency.version == null) {
+            throw new GradleException(
+                    'The Java API must declare an explicit org.jooq:jooq version')
+        }
+
+        def pom = new groovy.xml.XmlSlurper(false, false).parse(pomFile)
+        def publishedJooqDependencies = pom.dependencies.dependency.findAll {
+            it.groupId.text() == 'org.jooq' && it.artifactId.text() == 'jooq'
+        }
+        if (publishedJooqDependencies.size() != 1) {
+            throw new GradleException(
+                    'Publication POM must contain exactly one org.jooq:jooq dependency')
+        }
+        def publishedJooqVersion = publishedJooqDependencies[0].version.text()
+        if (publishedJooqVersion != declaredJooqDependency.version) {
+            throw new GradleException(
+                    'Publication POM org.jooq:jooq version does not match the Java API: '
+                            + "published=${publishedJooqVersion}, "
+                            + "declared=${declaredJooqDependency.version}")
         }
     }
 }
