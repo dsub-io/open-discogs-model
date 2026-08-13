@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/dsub-io/open-discogs-model/compare/v0.3.1...v0.3.2) (2026-08-13)
+
+
+### Performance Improvements
+
+* optimize combined release filters ([51cc7b3](https://github.com/dsub-io/open-discogs-model/commit/51cc7b3822000ae1b7ef70cb676933be5d1bda41))
+
 ## [0.3.1](https://github.com/dsub-io/open-discogs-model/compare/v0.3.0...v0.3.1) (2026-08-13)
 
 
