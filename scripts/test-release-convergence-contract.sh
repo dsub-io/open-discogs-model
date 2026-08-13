@@ -157,28 +157,6 @@ apply_release_identity_migrations() {
   done
 }
 
-apply_relation_ordering_migrations() {
-  local container_name=$1
-  local database_name=$2
-  local number
-  local version
-  local migration
-
-  for number in {17..38}; do
-    printf -v version '%03d' "$number"
-    migration="$(find "$repository_root/schema/migrations" \
-      -maxdepth 1 -type f -name "V${version}__*.sql" -print -quit)"
-    if [[ -z "$migration" ]]; then
-      printf 'Missing migration V%s\n' "$version" >&2
-      return 1
-    fi
-    docker exec --interactive "$container_name" \
-      psql --username postgres --dbname "$database_name" \
-      --no-psqlrc --set ON_ERROR_STOP=1 --single-transaction \
-      < "$migration" >/dev/null
-  done
-}
-
 execute_sql() {
   local container_name=$1
   local database_name=$2
@@ -218,82 +196,14 @@ relation_heap_nodes() {
       select string_agg(relname || ':' || relfilenode::text, ',' order by relname)
       from pg_class
       where oid in (
-        'public.artist_alias'::regclass,
-        'public.artist_group'::regclass,
-        'public.artist_member'::regclass,
-        'public.artist_name_variation'::regclass,
-        'public.artist_url'::regclass,
-        'public.label_sub_label'::regclass,
-        'public.label_url'::regclass,
-        'public.master_artist'::regclass,
-        'public.master_genre'::regclass,
-        'public.master_style'::regclass,
-        'public.master_video'::regclass,
-        'public.label_release_item'::regclass,
-        'public.release_item_artist'::regclass,
         'public.release_item_credited_artist'::regclass,
         'public.release_item_format'::regclass,
-        'public.release_item_genre'::regclass,
         'public.release_item_identifier'::regclass,
         'public.release_item_image'::regclass,
-        'public.release_item_style'::regclass,
         'public.release_item_track'::regclass,
         'public.release_item_video'::regclass,
         'public.release_item_work'::regclass
       );"
-}
-
-validate_relation_ordering_migrations() {
-  local container_name=$1
-  local database_name=$2
-
-  assert_scalar "$container_name" "$database_name" "
-    select count(*)
-    from information_schema.columns
-    where table_schema = 'public'
-      and column_name = 'ordinal'
-      and data_type = 'integer'
-      and is_nullable = 'YES'
-      and table_name in (
-        'artist_alias', 'artist_group', 'artist_member',
-        'artist_name_variation', 'artist_url', 'label_sub_label', 'label_url',
-        'master_artist', 'master_genre', 'master_style', 'master_video',
-        'label_release_item', 'release_item_artist',
-        'release_item_credited_artist', 'release_item_format',
-        'release_item_genre', 'release_item_identifier', 'release_item_image',
-        'release_item_style', 'release_item_track', 'release_item_video',
-        'release_item_work'
-      )
-  " "22"
-  assert_scalar "$container_name" "$database_name" "
-    select count(*)
-    from pg_constraint
-    where conname like 'ck_%_ordinal_non_negative'
-      and not convalidated
-  " "22"
-  assert_scalar "$container_name" "$database_name" "
-    select count(*)
-    from (
-      select ordinal from public.release_item_credited_artist
-      union all select ordinal from public.release_item_format
-      union all select ordinal from public.release_item_identifier
-      union all select ordinal from public.release_item_image
-      union all select ordinal from public.release_item_track
-      union all select ordinal from public.release_item_video
-      union all select ordinal from public.release_item_work
-    ) seeded_relations
-    where ordinal is null
-  " "7"
-  expect_sql_failure "$container_name" "$database_name" "
-    update public.release_item_track set ordinal = -1 where id = 1004;
-  "
-  execute_sql "$container_name" "$database_name" "
-    update public.release_item_track set ordinal = 0 where id = 1004;
-  "
-  assert_scalar "$container_name" "$database_name" "
-    select ordinal from public.release_item_track where id = 1004
-  " "0"
-  assert_scalar "$container_name" "$database_name" "show lock_timeout" "0"
 }
 
 expect_sql_failure() {
@@ -942,16 +852,14 @@ run_postgres_contract_test() {
   validate_successful_migration "$container_name" contract_good
   heap_nodes_before="$(relation_heap_nodes "$container_name" contract_good)"
   apply_release_identity_migrations "$container_name" contract_good
-  apply_relation_ordering_migrations "$container_name" contract_good
   heap_nodes_after="$(relation_heap_nodes "$container_name" contract_good)"
   if [[ "$heap_nodes_after" != "$heap_nodes_before" ]]; then
-    printf 'Catalog relation heap rewrite detected: before=%s after=%s\n' \
+    printf 'Release relation heap rewrite detected: before=%s after=%s\n' \
       "$heap_nodes_before" "$heap_nodes_after" >&2
     return 1
   fi
   validate_release_relation_identity_migration "$container_name" contract_good
   validate_release_format_quantity_migration "$container_name" contract_good
-  validate_relation_ordering_migrations "$container_name" contract_good
 
   apply_v009 "$container_name" contract_lock
   validate_identity_migration_lock_timeout "$container_name" contract_lock

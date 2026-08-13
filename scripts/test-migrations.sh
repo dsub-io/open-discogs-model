@@ -133,7 +133,7 @@ if [[ "$row_count" != 3 ]]; then
   exit 1
 fi
 
-for version in $(seq -f '%03g' 9 40); do
+for version in $(seq -f '%03g' 9 18); do
   migration="$(find "$repository_root/schema/migrations" \
     -maxdepth 1 -type f -name "V${version}__*.sql" -print -quit)"
   if [[ -z "$migration" ]]; then
@@ -204,7 +204,7 @@ docker exec "$container_name" \
 docker exec --interactive "$container_name" \
   psql --username migrationtest --dbname migrationtest \
   --set ON_ERROR_STOP=1 \
-  < "$repository_root/schema/migrations/V040__catalog_readiness_state.sql" \
+  < "$repository_root/schema/migrations/V018__catalog_readiness_state.sql" \
   >/dev/null
 
 adopted_readiness="$(docker exec "$container_name" \

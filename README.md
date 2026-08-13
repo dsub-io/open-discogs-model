@@ -172,21 +172,13 @@ canonical decimal value in `release_item_format.quantity_text`; the existing
 `quantity` column remains populated only when the value fits for compatibility.
 Legacy rows remain valid and are filled as their release roots are reconciled.
 
-V017-V038 add the model-owned
-[`relation-ordering-v1`](schema/contracts/relation-ordering-v1.md) ordinal to
-each catalog relation. These migrations are metadata-only transition steps:
-they do not backfill the full catalog or create indexes. Go and Java importers
-dual-write source ordinals, readers preserve legacy order with
-`coalesce(ordinal, id)`, and bounded owner-scoped backfill belongs to bootstrap
-finalization rather than application startup.
-
-V039 removes the redundant `created_at` column from catalog relations without
+V017 removes the redundant `created_at` column from catalog relations without
 rewriting relation rows. Relations retain `last_modified_at` as the source
-observation time of the most recent canonical payload or ordinal mutation;
-unchanged refreshes do not advance it. Root entity creation and mutation
-timestamps are unchanged.
+observation time of the most recent canonical payload mutation; unchanged
+refreshes do not advance it. Root entity creation and mutation timestamps are
+unchanged.
 
-V040 adds durable per-entity catalog state. A database without a successful
+V018 adds durable per-entity catalog state. A database without a successful
 checkpoint begins in `bootstrap_pending`; starting an import records whether it
 is a `bootstrap` or `refresh`, and only successful post-load finalization may
 move the entity to `ready`. `discogs_catalog_readiness.ready` is true only when

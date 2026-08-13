@@ -298,29 +298,6 @@ tasks.register('validateGeneratedSchema') {
                     "Generated schema is missing release relation fields:\n - "
                             + missingRelationFields.join('\n - '))
         }
-
-        def ordinalRelations = [
-                'ArtistAlias', 'ArtistGroup', 'ArtistMember',
-                'ArtistNameVariation', 'ArtistUrl', 'LabelSubLabel', 'LabelUrl',
-                'MasterArtist', 'MasterGenre', 'MasterStyle', 'MasterVideo',
-                'LabelReleaseItem', 'ReleaseItemArtist',
-                'ReleaseItemCreditedArtist', 'ReleaseItemFormat',
-                'ReleaseItemGenre', 'ReleaseItemIdentifier', 'ReleaseItemImage',
-                'ReleaseItemStyle', 'ReleaseItemTrack', 'ReleaseItemVideo',
-                'ReleaseItemWork'
-        ]
-        def missingOrdinalFields = ordinalRelations.findAll { relation ->
-            def source = generatedDirectory
-                    .file("io/dsub/opendiscogs/jooq/tables/${relation}.java")
-                    .asFile
-            !source.isFile() || !source.getText('UTF-8').contains(
-                    "TableField<${relation}Record, Integer> ORDINAL")
-        }
-        if (!missingOrdinalFields.isEmpty()) {
-            throw new GradleException(
-                    "Generated schema is missing typed relation ordinals:\n - "
-                            + missingOrdinalFields.join('\n - '))
-        }
     }
 }
 

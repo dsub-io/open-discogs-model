@@ -63,7 +63,6 @@ type ArtistAlias struct {
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	AliasID        int32     `db:"alias_id" json:"alias_id" gorm:"column:alias_id"`
 	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ArtistAlias.
@@ -75,7 +74,6 @@ type ArtistGroup struct {
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
 	GroupID        int32     `db:"group_id" json:"group_id" gorm:"column:group_id"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ArtistGroup.
@@ -87,7 +85,6 @@ type ArtistMember struct {
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
 	MemberID       int32     `db:"member_id" json:"member_id" gorm:"column:member_id"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ArtistMember.
@@ -100,7 +97,6 @@ type ArtistNameVariation struct {
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	NameVariation  string    `db:"name_variation" json:"name_variation" gorm:"column:name_variation"`
 	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ArtistNameVariation.
@@ -113,7 +109,6 @@ type ArtistURL struct {
 	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
 	URL            string    `db:"url" json:"url" gorm:"column:url"`
 	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ArtistURL.
@@ -258,7 +253,6 @@ type LabelReleaseItem struct {
 	CategoryNotation *string   `db:"category_notation" json:"category_notation" gorm:"column:category_notation"`
 	LabelID          int32     `db:"label_id" json:"label_id" gorm:"column:label_id"`
 	ReleaseItemID    int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
-	Ordinal          *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by LabelReleaseItem.
@@ -270,7 +264,6 @@ type LabelSubLabel struct {
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	ParentLabelID  int32     `db:"parent_label_id" json:"parent_label_id" gorm:"column:parent_label_id"`
 	SubLabelID     int32     `db:"sub_label_id" json:"sub_label_id" gorm:"column:sub_label_id"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by LabelSubLabel.
@@ -283,7 +276,6 @@ type LabelURL struct {
 	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
 	URL            string    `db:"url" json:"url" gorm:"column:url"`
 	LabelID        int32     `db:"label_id" json:"label_id" gorm:"column:label_id"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by LabelURL.
@@ -309,7 +301,6 @@ type MasterArtist struct {
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
 	MasterID       int32     `db:"master_id" json:"master_id" gorm:"column:master_id"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by MasterArtist.
@@ -321,7 +312,6 @@ type MasterGenre struct {
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Genre          string    `db:"genre" json:"genre" gorm:"column:genre"`
 	MasterID       int32     `db:"master_id" json:"master_id" gorm:"column:master_id"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by MasterGenre.
@@ -333,7 +323,6 @@ type MasterStyle struct {
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	MasterID       int32     `db:"master_id" json:"master_id" gorm:"column:master_id"`
 	Style          string    `db:"style" json:"style" gorm:"column:style"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by MasterStyle.
@@ -348,7 +337,6 @@ type MasterVideo struct {
 	Title          *string   `db:"title" json:"title" gorm:"column:title"`
 	URL            *string   `db:"url" json:"url" gorm:"column:url"`
 	MasterID       int32     `db:"master_id" json:"master_id" gorm:"column:master_id"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by MasterVideo.
@@ -382,7 +370,6 @@ type ReleaseItemArtist struct {
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
 	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemArtist.
@@ -397,7 +384,6 @@ type ReleaseItemCreditedArtist struct {
 	ArtistID       int32         `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
 	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
 	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
-	Ordinal        *int32        `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemCreditedArtist.
@@ -415,7 +401,6 @@ type ReleaseItemFormat struct {
 	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
 	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 	QuantityText   *string       `db:"quantity_text" json:"quantity_text" gorm:"column:quantity_text"`
-	Ordinal        *int32        `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemFormat.
@@ -427,7 +412,6 @@ type ReleaseItemGenre struct {
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Genre          string    `db:"genre" json:"genre" gorm:"column:genre"`
 	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemGenre.
@@ -443,7 +427,6 @@ type ReleaseItemIdentifier struct {
 	Value          *string       `db:"value" json:"value" gorm:"column:value"`
 	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
 	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
-	Ordinal        *int32        `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemIdentifier.
@@ -457,7 +440,6 @@ type ReleaseItemImage struct {
 	FileName       *string       `db:"file_name" json:"file_name" gorm:"column:file_name"`
 	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
 	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
-	Ordinal        *int32        `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemImage.
@@ -469,7 +451,6 @@ type ReleaseItemStyle struct {
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
 	Style          string    `db:"style" json:"style" gorm:"column:style"`
-	Ordinal        *int32    `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemStyle.
@@ -485,7 +466,6 @@ type ReleaseItemTrack struct {
 	Title          *string       `db:"title" json:"title" gorm:"column:title"`
 	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
 	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
-	Ordinal        *int32        `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemTrack.
@@ -501,7 +481,6 @@ type ReleaseItemVideo struct {
 	URL            *string       `db:"url" json:"url" gorm:"column:url"`
 	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
 	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
-	Ordinal        *int32        `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemVideo.
@@ -516,7 +495,6 @@ type ReleaseItemWork struct {
 	LabelID        int32         `db:"label_id" json:"label_id" gorm:"column:label_id"`
 	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
 	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
-	Ordinal        *int32        `db:"ordinal" json:"ordinal" gorm:"column:ordinal"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemWork.
