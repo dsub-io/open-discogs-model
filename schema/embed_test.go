@@ -57,6 +57,7 @@ func TestMigrations(t *testing.T) {
 		"V036__release_item_track_ordinal.sql",
 		"V037__release_item_video_ordinal.sql",
 		"V038__release_item_work_ordinal.sql",
+		"V039__remove_relation_created_at.sql",
 	}
 	if len(entries) != len(want) {
 		t.Fatalf("migration count = %d, want %d", len(entries), len(want))

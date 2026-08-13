@@ -178,6 +178,12 @@ dual-write source ordinals, readers preserve legacy order with
 `coalesce(ordinal, id)`, and bounded owner-scoped backfill belongs to bootstrap
 finalization rather than application startup.
 
+V039 removes the redundant `created_at` column from catalog relations without
+rewriting relation rows. Relations retain `last_modified_at` as the source
+observation time of the most recent canonical payload or ordinal mutation;
+unchanged refreshes do not advance it. Root entity creation and mutation
+timestamps are unchanged.
+
 ## Development
 
 The complete local verification requires Docker, Go 1.26, and Temurin 21.

@@ -69,3 +69,11 @@ After every importer and reader uses ordinal and backfill validation succeeds,
 a later migration may make ordinal non-null and remove relation surrogate IDs,
 their primary-key indexes, and owned sequences. Canonical identity constraints
 and reverse lookup indexes remain.
+
+## Mutation time
+
+Catalog relations store one timestamp: `last_modified_at`. It is the source
+observation time attached to the most recent accepted canonical payload or
+ordinal mutation. An unchanged refresh does not update it. Relation insertion
+time is not a separate catalog fact, so V039 removes the duplicate
+`created_at`; root entity timestamps keep their existing contract.
