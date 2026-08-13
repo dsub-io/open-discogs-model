@@ -169,6 +169,27 @@ if [[ "$relation_id_columns" != '0' ]]; then
   exit 1
 fi
 
+bootstrap_constraint_inventory="$(docker exec "$container_name" \
+  psql --username migrationtest --dbname migrationtest \
+  --no-align --tuples-only --field-separator '|' \
+  --command "
+    select count(*),
+           count(constraint_state.oid),
+           count(constraint_state.oid)
+               filter (where constraint_state.convalidated)
+    from public.discogs_bootstrap_foreign_keys() foreign_key
+    left join pg_constraint constraint_state
+      on constraint_state.conrelid = to_regclass(
+           format('public.%I', foreign_key.table_name)
+         )
+     and constraint_state.conname = foreign_key.constraint_name
+  ")"
+if [[ "$bootstrap_constraint_inventory" != '37|37|37' ]]; then
+  printf 'Unexpected bootstrap foreign-key inventory: %s\n' \
+    "$bootstrap_constraint_inventory" >&2
+  exit 1
+fi
+
 docker exec "$container_name" \
   psql --username migrationtest --dbname migrationtest \
   --set ON_ERROR_STOP=1 --command "
