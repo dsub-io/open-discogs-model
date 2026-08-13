@@ -133,7 +133,7 @@ if [[ "$row_count" != 3 ]]; then
   exit 1
 fi
 
-for version in $(seq -f '%03g' 9 18); do
+for version in $(seq -f '%03g' 9 19); do
   migration="$(find "$repository_root/schema/migrations" \
     -maxdepth 1 -type f -name "V${version}__*.sql" -print -quit)"
   if [[ -z "$migration" ]]; then
@@ -144,6 +144,30 @@ for version in $(seq -f '%03g' 9 18); do
     psql --username migrationtest --dbname migrationtest \
     --set ON_ERROR_STOP=1 < "$migration" >/dev/null
 done
+
+relation_id_columns="$(docker exec "$container_name" \
+  psql --username migrationtest --dbname migrationtest \
+  --no-align --tuples-only \
+  --command "
+    select count(*)
+    from information_schema.columns
+    where table_schema = 'public'
+      and column_name = 'id'
+      and table_name in (
+        'release_item_genre', 'release_item_track', 'label_release_item',
+        'release_item_image', 'release_item_work', 'release_item_identifier',
+        'master_video', 'master_genre', 'master_style', 'release_item_style',
+        'label_sub_label', 'release_item_video', 'label_url',
+        'release_item_format', 'artist_alias', 'artist_name_variation',
+        'master_artist', 'release_item_artist',
+        'release_item_credited_artist', 'artist_url', 'artist_group',
+        'artist_member'
+      )
+  ")"
+if [[ "$relation_id_columns" != '0' ]]; then
+  printf 'Relation tables retained %s surrogate ID columns\n' "$relation_id_columns" >&2
+  exit 1
+fi
 
 entity_state="$(docker exec "$container_name" \
   psql --username migrationtest --dbname migrationtest \

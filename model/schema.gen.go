@@ -59,7 +59,6 @@ func (Artist) TableName() string { return "artist" }
 
 // ArtistAlias represents a row in artist_alias.
 type ArtistAlias struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	AliasID        int32     `db:"alias_id" json:"alias_id" gorm:"column:alias_id"`
 	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
@@ -70,7 +69,6 @@ func (ArtistAlias) TableName() string { return "artist_alias" }
 
 // ArtistGroup represents a row in artist_group.
 type ArtistGroup struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
 	GroupID        int32     `db:"group_id" json:"group_id" gorm:"column:group_id"`
@@ -81,7 +79,6 @@ func (ArtistGroup) TableName() string { return "artist_group" }
 
 // ArtistMember represents a row in artist_member.
 type ArtistMember struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
 	MemberID       int32     `db:"member_id" json:"member_id" gorm:"column:member_id"`
@@ -92,7 +89,6 @@ func (ArtistMember) TableName() string { return "artist_member" }
 
 // ArtistNameVariation represents a row in artist_name_variation.
 type ArtistNameVariation struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	NameVariation  string    `db:"name_variation" json:"name_variation" gorm:"column:name_variation"`
@@ -104,7 +100,6 @@ func (ArtistNameVariation) TableName() string { return "artist_name_variation" }
 
 // ArtistURL represents a row in artist_url.
 type ArtistURL struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
 	URL            string    `db:"url" json:"url" gorm:"column:url"`
@@ -248,7 +243,6 @@ func (Label) TableName() string { return "label" }
 
 // LabelReleaseItem represents a row in label_release_item.
 type LabelReleaseItem struct {
-	ID               int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt   time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	CategoryNotation *string   `db:"category_notation" json:"category_notation" gorm:"column:category_notation"`
 	LabelID          int32     `db:"label_id" json:"label_id" gorm:"column:label_id"`
@@ -260,7 +254,6 @@ func (LabelReleaseItem) TableName() string { return "label_release_item" }
 
 // LabelSubLabel represents a row in label_sub_label.
 type LabelSubLabel struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	ParentLabelID  int32     `db:"parent_label_id" json:"parent_label_id" gorm:"column:parent_label_id"`
 	SubLabelID     int32     `db:"sub_label_id" json:"sub_label_id" gorm:"column:sub_label_id"`
@@ -271,7 +264,6 @@ func (LabelSubLabel) TableName() string { return "label_sub_label" }
 
 // LabelURL represents a row in label_url.
 type LabelURL struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
 	URL            string    `db:"url" json:"url" gorm:"column:url"`
@@ -297,7 +289,6 @@ func (Master) TableName() string { return "master" }
 
 // MasterArtist represents a row in master_artist.
 type MasterArtist struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
 	MasterID       int32     `db:"master_id" json:"master_id" gorm:"column:master_id"`
@@ -308,7 +299,6 @@ func (MasterArtist) TableName() string { return "master_artist" }
 
 // MasterGenre represents a row in master_genre.
 type MasterGenre struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Genre          string    `db:"genre" json:"genre" gorm:"column:genre"`
 	MasterID       int32     `db:"master_id" json:"master_id" gorm:"column:master_id"`
@@ -319,7 +309,6 @@ func (MasterGenre) TableName() string { return "master_genre" }
 
 // MasterStyle represents a row in master_style.
 type MasterStyle struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	MasterID       int32     `db:"master_id" json:"master_id" gorm:"column:master_id"`
 	Style          string    `db:"style" json:"style" gorm:"column:style"`
@@ -330,7 +319,6 @@ func (MasterStyle) TableName() string { return "master_style" }
 
 // MasterVideo represents a row in master_video.
 type MasterVideo struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
 	Description    *string   `db:"description" json:"description" gorm:"column:description"`
@@ -366,7 +354,6 @@ func (ReleaseItem) TableName() string { return "release_item" }
 
 // ReleaseItemArtist represents a row in release_item_artist.
 type ReleaseItemArtist struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
 	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
@@ -377,7 +364,6 @@ func (ReleaseItemArtist) TableName() string { return "release_item_artist" }
 
 // ReleaseItemCreditedArtist represents a row in release_item_credited_artist.
 type ReleaseItemCreditedArtist struct {
-	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
 	Role           *string       `db:"role" json:"role" gorm:"column:role"`
@@ -391,7 +377,6 @@ func (ReleaseItemCreditedArtist) TableName() string { return "release_item_credi
 
 // ReleaseItemFormat represents a row in release_item_format.
 type ReleaseItemFormat struct {
-	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
 	Description    *string       `db:"description" json:"description" gorm:"column:description"`
@@ -408,7 +393,6 @@ func (ReleaseItemFormat) TableName() string { return "release_item_format" }
 
 // ReleaseItemGenre represents a row in release_item_genre.
 type ReleaseItemGenre struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Genre          string    `db:"genre" json:"genre" gorm:"column:genre"`
 	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
@@ -419,7 +403,6 @@ func (ReleaseItemGenre) TableName() string { return "release_item_genre" }
 
 // ReleaseItemIdentifier represents a row in release_item_identifier.
 type ReleaseItemIdentifier struct {
-	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
 	Description    *string       `db:"description" json:"description" gorm:"column:description"`
@@ -434,7 +417,6 @@ func (ReleaseItemIdentifier) TableName() string { return "release_item_identifie
 
 // ReleaseItemImage represents a row in release_item_image.
 type ReleaseItemImage struct {
-	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
 	FileName       *string       `db:"file_name" json:"file_name" gorm:"column:file_name"`
@@ -447,7 +429,6 @@ func (ReleaseItemImage) TableName() string { return "release_item_image" }
 
 // ReleaseItemStyle represents a row in release_item_style.
 type ReleaseItemStyle struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
 	Style          string    `db:"style" json:"style" gorm:"column:style"`
@@ -458,7 +439,6 @@ func (ReleaseItemStyle) TableName() string { return "release_item_style" }
 
 // ReleaseItemTrack represents a row in release_item_track.
 type ReleaseItemTrack struct {
-	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
 	Duration       *string       `db:"duration" json:"duration" gorm:"column:duration"`
@@ -473,7 +453,6 @@ func (ReleaseItemTrack) TableName() string { return "release_item_track" }
 
 // ReleaseItemVideo represents a row in release_item_video.
 type ReleaseItemVideo struct {
-	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
 	Description    *string       `db:"description" json:"description" gorm:"column:description"`
@@ -488,7 +467,6 @@ func (ReleaseItemVideo) TableName() string { return "release_item_video" }
 
 // ReleaseItemWork represents a row in release_item_work.
 type ReleaseItemWork struct {
-	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
 	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
 	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
 	Work           *string       `db:"work" json:"work" gorm:"column:work"`

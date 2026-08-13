@@ -186,6 +186,10 @@ Artist, Label, Master, and Release are all ready. Existing databases adopt only
 entities backed by a successful canonical import checkpoint; unknown or partial
 legacy state remains unavailable until a verified import completes.
 
+V019 removes relation-table surrogate IDs and their primary-key indexes.
+Canonical natural unique keys identify relation rows; root resource IDs remain
+unchanged. Consumers must not depend on relation row IDs or physical row order.
+
 ## Development
 
 The complete local verification requires Docker, Go 1.26, and Temurin 21.
