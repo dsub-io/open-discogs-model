@@ -130,8 +130,9 @@ separate, audited downgrade option is explicitly requested.
 The schema also owns the bounded read-path indexes used by the Go API. Trigram
 indexes cover artist and label names plus master and release titles; no index is
 created for large profile, contact, or notes fields. Reverse relationship keys
-and release date, country, master, and master-membership filters have dedicated
-indexes. PostgreSQL installations must make the bundled `pg_trgm` extension
+and release date, country, master, master-membership, and combined
+country/master/date filters have dedicated indexes. PostgreSQL installations
+must make the bundled `pg_trgm` extension
 available to the migration owner. Canonical batch finalization analyzes newly
 bootstrapped tables before serving traffic so the planner sees the imported data
 distribution.
