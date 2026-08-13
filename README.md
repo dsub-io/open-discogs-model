@@ -170,6 +170,14 @@ canonical decimal value in `release_item_format.quantity_text`; the existing
 `quantity` column remains populated only when the value fits for compatibility.
 Legacy rows remain valid and are filled as their release roots are reconciled.
 
+V017-V038 add the model-owned
+[`relation-ordering-v1`](schema/contracts/relation-ordering-v1.md) ordinal to
+each catalog relation. These migrations are metadata-only transition steps:
+they do not backfill the full catalog or create indexes. Go and Java importers
+dual-write source ordinals, readers preserve legacy order with
+`coalesce(ordinal, id)`, and bounded owner-scoped backfill belongs to bootstrap
+finalization rather than application startup.
+
 ## Development
 
 The complete local verification requires Docker, Go 1.26, and Temurin 21.
