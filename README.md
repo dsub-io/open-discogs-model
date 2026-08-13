@@ -131,11 +131,20 @@ The schema also owns the bounded read-path indexes used by the Go API. Trigram
 indexes cover artist and label names plus master and release titles; no index is
 created for large profile, contact, or notes fields. Reverse relationship keys
 and release date, country, master, master-membership, and combined
-country/master/date filters have dedicated indexes. PostgreSQL installations
+country/master/date filters have dedicated indexes. Exact Label/catalog-number
+and identifier type/value Release lookups use dedicated cursor-compatible
+indexes; identifier queries recheck the original value after their bounded hash
+lookup. PostgreSQL installations
 must make the bundled `pg_trgm` extension
 available to the migration owner. Canonical batch finalization analyzes newly
 bootstrapped tables before serving traffic so the planner sees the imported data
 distribution.
+V023 builds the two exact-lookup indexes over existing relation rows. Apply it
+only while Go and Java importers are stopped and reserve maintenance I/O, WAL,
+and temporary disk headroom appropriate to the populated tables. API reads may
+continue, but the new exact lookup routes must not be deployed until V023 has
+completed. The migration changes no relation identity or import contract
+revision.
 The reproducible synthetic before/after results and their full-dump limitations
 are recorded in
 [`docs/performance/2026-08-11-api-query-indexes.md`](docs/performance/2026-08-11-api-query-indexes.md).

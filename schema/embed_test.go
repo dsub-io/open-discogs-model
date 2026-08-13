@@ -41,6 +41,7 @@ func TestMigrations(t *testing.T) {
 		"V020__bootstrap_foreign_key_finalization.sql",
 		"V021__non_release_relation_identity.sql",
 		"V022__release_combined_filter_index.sql",
+		"V023__release_exact_lookup_indexes.sql",
 	}
 	if len(entries) != len(want) {
 		t.Fatalf("migration count = %d, want %d", len(entries), len(want))
