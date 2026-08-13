@@ -99,8 +99,9 @@ ledger supports parallel commits without treating gaps as completed work and
 may be pruned once a successful run no longer needs it.
 Each `discogs_import_run_dump` row also records the entity-specific import
 contract revision. Successful checkpoints are reusable across Java and Go only
-at the current entity revision; interrupted runs additionally require the same
-processor name and version. V009 preserves existing rows at revision `1` and
+at the current entity revision; interrupted runs use that same revision rather
+than processor identity to determine cross-language compatibility. V009
+preserves existing rows at revision `1` and
 sets the release convergence contract to revision `2`. Importers that implement
 V010-V016 relation identity use `artist=1`, `label=1`, `master=1`, and
 `release=3`.
@@ -118,8 +119,9 @@ same normalized business state. The `discogs_import_checkpoint` view exposes
 the last successfully applied dump date and provenance for each entity type.
 Progress advances in the same transaction as a root entity's complete
 canonical relation set. A retry may resume only from an identical manifest,
-processor, processor version, entity type, and dump, while forced imports
-always start from zero.
+entity type, dump, chunk size, and import contract revision, while forced
+imports always start from zero. Processor name and version remain provenance,
+not a resume boundary.
 Per-entity PostgreSQL advisory locks allow disjoint imports to run concurrently
 while rejecting overlapping writers. Older dumps are rejected unless a
 separate, audited downgrade option is explicitly requested.

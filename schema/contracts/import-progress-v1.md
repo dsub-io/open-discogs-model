@@ -29,14 +29,20 @@ progress from the most recent failed or abandoned run only when all of the
 following values match exactly:
 
 - manifest SHA-256;
-- processor name and processor version;
 - entity type and dump ID;
-- chunk size.
+- chunk size;
+- entity-specific import contract revision.
+
+`processor` and `processor_version` identify the implementation for operations
+and diagnostics; they do not define resume compatibility. Go and Java may
+transfer progress when the values above match. Every importer change that can
+alter chunk boundaries or canonical output must increment the affected entity's
+shared import contract revision before release.
 
 Progress is not resumable if a newer successful checkpoint has overwritten any
-selected entity with a different dump, processor, or processor version. This
-check is relative to the failed run's completion time: an older checkpoint does
-not invalidate chunks that the failed run committed afterward.
+selected entity with a different dump or import contract revision. This check
+is relative to the failed run's completion time: an older checkpoint does not
+invalidate chunks that the failed run committed afterward.
 
 The new run records that source run in `resumed_from_run_id` and copies its
 summary and chunk ledger atomically. A forced import starts every entity at zero
@@ -45,7 +51,7 @@ elements while locating ranges, but they must not rewrite or recount them.
 
 Once a retry owns a copied ledger, the source rows are transferred atomically.
 Other failed-run rows may be pruned only when every entity/dump pair is the
-current successful checkpoint produced by the same processor version;
+current successful checkpoint with the same import contract revision;
 historical success is insufficient. Chunk rows for a successful run may also
 be pruned because successful manifest identity, totals, and completion remain
 in the run history. Pruning must never remove the only valid ledger from which
