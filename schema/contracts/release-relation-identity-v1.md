@@ -48,3 +48,13 @@ A generated slot is the signed interpretation of the first four big-endian bytes
 A candidate is skipped when it is any row's reserved legacy hash or an already allocated slot in the same scope. Exhausting all unsigned 32-bit attempts is an error. Stale reconciliation compares both `identity_sha256` and the allocated storage slot, so legacy null identities and changed slot assignments are replaced transactionally.
 
 The nullable digest columns make phase 1 a metadata-only schema addition for existing rows. A release import backfills only roots it processes and remains resumable after interruption. A later migration may build partial or concurrent digest indexes after backfill; it must not rewrite or synchronously index the complete catalog in this migration.
+
+## Golden vectors
+
+[`release-relation-identity-v1.tsv`](release-relation-identity-v1.tsv) is the
+machine-readable cross-language test resource. It uses a fixed eleven-column
+TSV schema. Field values are `null`, unused (`-`), or `hex:` followed by the
+UTF-8 bytes in lowercase hexadecimal. `digest` rows exercise normalization and
+framing, `slot` rows exercise signed storage-slot derivation, and `description`
+rows exercise ordered format-description reduction. Go and Java model tests
+must consume this same resource; copied vectors are not authoritative.

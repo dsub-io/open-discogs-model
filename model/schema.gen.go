@@ -361,14 +361,14 @@ func (ReleaseItemArtist) TableName() string { return "release_item_artist" }
 
 // ReleaseItemCreditedArtist represents a row in release_item_credited_artist.
 type ReleaseItemCreditedArtist struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
-	CreatedAt      time.Time `db:"created_at" json:"created_at" gorm:"column:created_at"`
-	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
-	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
-	Role           *string   `db:"role" json:"role" gorm:"column:role"`
-	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
-	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
-	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
+	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
+	CreatedAt      time.Time     `db:"created_at" json:"created_at" gorm:"column:created_at"`
+	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
+	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
+	Role           *string       `db:"role" json:"role" gorm:"column:role"`
+	ArtistID       int32         `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
+	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemCreditedArtist.
@@ -376,17 +376,17 @@ func (ReleaseItemCreditedArtist) TableName() string { return "release_item_credi
 
 // ReleaseItemFormat represents a row in release_item_format.
 type ReleaseItemFormat struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
-	CreatedAt      time.Time `db:"created_at" json:"created_at" gorm:"column:created_at"`
-	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
-	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
-	Description    *string   `db:"description" json:"description" gorm:"column:description"`
-	Name           *string   `db:"name" json:"name" gorm:"column:name"`
-	Quantity       *int32    `db:"quantity" json:"quantity" gorm:"column:quantity"`
-	Text           *string   `db:"text" json:"text" gorm:"column:text"`
-	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
-	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
-	QuantityText   *string   `db:"quantity_text" json:"quantity_text" gorm:"column:quantity_text"`
+	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
+	CreatedAt      time.Time     `db:"created_at" json:"created_at" gorm:"column:created_at"`
+	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
+	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
+	Description    *string       `db:"description" json:"description" gorm:"column:description"`
+	Name           *string       `db:"name" json:"name" gorm:"column:name"`
+	Quantity       *int32        `db:"quantity" json:"quantity" gorm:"column:quantity"`
+	Text           *string       `db:"text" json:"text" gorm:"column:text"`
+	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
+	QuantityText   *string       `db:"quantity_text" json:"quantity_text" gorm:"column:quantity_text"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemFormat.
@@ -406,15 +406,15 @@ func (ReleaseItemGenre) TableName() string { return "release_item_genre" }
 
 // ReleaseItemIdentifier represents a row in release_item_identifier.
 type ReleaseItemIdentifier struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
-	CreatedAt      time.Time `db:"created_at" json:"created_at" gorm:"column:created_at"`
-	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
-	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
-	Description    *string   `db:"description" json:"description" gorm:"column:description"`
-	Type           *string   `db:"type" json:"type" gorm:"column:type"`
-	Value          *string   `db:"value" json:"value" gorm:"column:value"`
-	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
-	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
+	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
+	CreatedAt      time.Time     `db:"created_at" json:"created_at" gorm:"column:created_at"`
+	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
+	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
+	Description    *string       `db:"description" json:"description" gorm:"column:description"`
+	Type           *string       `db:"type" json:"type" gorm:"column:type"`
+	Value          *string       `db:"value" json:"value" gorm:"column:value"`
+	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemIdentifier.
@@ -422,13 +422,13 @@ func (ReleaseItemIdentifier) TableName() string { return "release_item_identifie
 
 // ReleaseItemImage represents a row in release_item_image.
 type ReleaseItemImage struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
-	CreatedAt      time.Time `db:"created_at" json:"created_at" gorm:"column:created_at"`
-	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
-	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
-	FileName       *string   `db:"file_name" json:"file_name" gorm:"column:file_name"`
-	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
-	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
+	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
+	CreatedAt      time.Time     `db:"created_at" json:"created_at" gorm:"column:created_at"`
+	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
+	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
+	FileName       *string       `db:"file_name" json:"file_name" gorm:"column:file_name"`
+	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemImage.
@@ -448,15 +448,15 @@ func (ReleaseItemStyle) TableName() string { return "release_item_style" }
 
 // ReleaseItemTrack represents a row in release_item_track.
 type ReleaseItemTrack struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
-	CreatedAt      time.Time `db:"created_at" json:"created_at" gorm:"column:created_at"`
-	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
-	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
-	Duration       *string   `db:"duration" json:"duration" gorm:"column:duration"`
-	Position       *string   `db:"position" json:"position" gorm:"column:position"`
-	Title          *string   `db:"title" json:"title" gorm:"column:title"`
-	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
-	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
+	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
+	CreatedAt      time.Time     `db:"created_at" json:"created_at" gorm:"column:created_at"`
+	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
+	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
+	Duration       *string       `db:"duration" json:"duration" gorm:"column:duration"`
+	Position       *string       `db:"position" json:"position" gorm:"column:position"`
+	Title          *string       `db:"title" json:"title" gorm:"column:title"`
+	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemTrack.
@@ -464,15 +464,15 @@ func (ReleaseItemTrack) TableName() string { return "release_item_track" }
 
 // ReleaseItemVideo represents a row in release_item_video.
 type ReleaseItemVideo struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
-	CreatedAt      time.Time `db:"created_at" json:"created_at" gorm:"column:created_at"`
-	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
-	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
-	Description    *string   `db:"description" json:"description" gorm:"column:description"`
-	Title          *string   `db:"title" json:"title" gorm:"column:title"`
-	URL            *string   `db:"url" json:"url" gorm:"column:url"`
-	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
-	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
+	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
+	CreatedAt      time.Time     `db:"created_at" json:"created_at" gorm:"column:created_at"`
+	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
+	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
+	Description    *string       `db:"description" json:"description" gorm:"column:description"`
+	Title          *string       `db:"title" json:"title" gorm:"column:title"`
+	URL            *string       `db:"url" json:"url" gorm:"column:url"`
+	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemVideo.
@@ -480,14 +480,14 @@ func (ReleaseItemVideo) TableName() string { return "release_item_video" }
 
 // ReleaseItemWork represents a row in release_item_work.
 type ReleaseItemWork struct {
-	ID             int32     `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
-	CreatedAt      time.Time `db:"created_at" json:"created_at" gorm:"column:created_at"`
-	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
-	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
-	Work           *string   `db:"work" json:"work" gorm:"column:work"`
-	LabelID        int32     `db:"label_id" json:"label_id" gorm:"column:label_id"`
-	ReleaseItemID  int32     `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
-	IdentitySHA256 []byte    `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
+	ID             int32         `db:"id" json:"id" gorm:"column:id;primaryKey;autoIncrement"`
+	CreatedAt      time.Time     `db:"created_at" json:"created_at" gorm:"column:created_at"`
+	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
+	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
+	Work           *string       `db:"work" json:"work" gorm:"column:work"`
+	LabelID        int32         `db:"label_id" json:"label_id" gorm:"column:label_id"`
+	ReleaseItemID  int32         `db:"release_item_id" json:"release_item_id" gorm:"column:release_item_id"`
+	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ReleaseItemWork.

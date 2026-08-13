@@ -264,19 +264,22 @@ tasks.register('validateGeneratedSchema') {
 
         def requiredRelationFields = [
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItemCreditedArtist.java':
-                        ['IDENTITY_SHA256'],
+                        ['TableField<ReleaseItemCreditedArtistRecord, byte[]> IDENTITY_SHA256'],
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItemFormat.java':
-                        ['IDENTITY_SHA256', 'QUANTITY_TEXT'],
+                        [
+                                'TableField<ReleaseItemFormatRecord, byte[]> IDENTITY_SHA256',
+                                'TableField<ReleaseItemFormatRecord, String> QUANTITY_TEXT'
+                        ],
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItemIdentifier.java':
-                        ['IDENTITY_SHA256'],
+                        ['TableField<ReleaseItemIdentifierRecord, byte[]> IDENTITY_SHA256'],
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItemImage.java':
-                        ['IDENTITY_SHA256'],
+                        ['TableField<ReleaseItemImageRecord, byte[]> IDENTITY_SHA256'],
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItemTrack.java':
-                        ['IDENTITY_SHA256'],
+                        ['TableField<ReleaseItemTrackRecord, byte[]> IDENTITY_SHA256'],
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItemVideo.java':
-                        ['IDENTITY_SHA256'],
+                        ['TableField<ReleaseItemVideoRecord, byte[]> IDENTITY_SHA256'],
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItemWork.java':
-                        ['IDENTITY_SHA256']
+                        ['TableField<ReleaseItemWorkRecord, byte[]> IDENTITY_SHA256']
         ]
         def missingRelationFields = requiredRelationFields.collectMany { path, fragments ->
             def source = generatedDirectory.file(path).asFile
