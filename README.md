@@ -131,8 +131,9 @@ indexes cover artist and label names plus master and release titles; no index is
 created for large profile, contact, or notes fields. Reverse relationship keys
 and release date, country, master, and master-membership filters have dedicated
 indexes. PostgreSQL installations must make the bundled `pg_trgm` extension
-available to the migration owner. After a bulk import, run `ANALYZE` before
-serving traffic so the planner sees the imported data distribution.
+available to the migration owner. Canonical batch finalization analyzes newly
+bootstrapped tables before serving traffic so the planner sees the imported data
+distribution.
 The reproducible synthetic before/after results and their full-dump limitations
 are recorded in
 [`docs/performance/2026-08-11-api-query-indexes.md`](docs/performance/2026-08-11-api-query-indexes.md).
@@ -189,6 +190,13 @@ legacy state remains unavailable until a verified import completes.
 V019 removes relation-table surrogate IDs and their primary-key indexes.
 Canonical natural unique keys identify relation rows; root resource IDs remain
 unchanged. Consumers must not depend on relation row IDs or physical row order.
+
+V020 defines the canonical foreign-key inventory eligible for initial bulk-load
+deferral. Batch importers drop only those constraints for entities whose durable
+operation is `bootstrap`; refresh imports keep every foreign key active. A
+successful bootstrap recreates missing keys as `NOT VALID`, validates each key,
+and analyzes the affected tables before setting catalog state to `ready`.
+Constraint creation, validation, or analysis failure leaves readiness false.
 
 ## Development
 

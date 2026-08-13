@@ -133,7 +133,7 @@ if [[ "$row_count" != 3 ]]; then
   exit 1
 fi
 
-for version in $(seq -f '%03g' 9 19); do
+for version in $(seq -f '%03g' 9 20); do
   migration="$(find "$repository_root/schema/migrations" \
     -maxdepth 1 -type f -name "V${version}__*.sql" -print -quit)"
   if [[ -z "$migration" ]]; then
@@ -168,6 +168,103 @@ if [[ "$relation_id_columns" != '0' ]]; then
   printf 'Relation tables retained %s surrogate ID columns\n' "$relation_id_columns" >&2
   exit 1
 fi
+
+docker exec "$container_name" \
+  psql --username migrationtest --dbname migrationtest \
+  --set ON_ERROR_STOP=1 --command "
+    insert into public.discogs_import_run (
+      manifest_sha256, status, processor, processor_version
+    ) values (repeat('b', 64), 'running', 'migration-test', '1');
+    update public.discogs_catalog_entity_state
+    set status = 'importing',
+        operation = 'bootstrap',
+        active_import_run_id = currval('discogs_import_run_id_seq')
+    where entity_type = 'artist';
+    select public.prepare_discogs_bootstrap_foreign_keys(
+      currval('discogs_import_run_id_seq')
+    );
+  " >/dev/null
+
+artist_bootstrap_constraints="$(docker exec "$container_name" \
+  psql --username migrationtest --dbname migrationtest \
+  --no-align --tuples-only \
+  --command "
+    select count(constraint_state.oid)
+    from public.discogs_bootstrap_foreign_keys() foreign_key
+    left join pg_constraint constraint_state
+      on constraint_state.conrelid = to_regclass(
+           format('public.%I', foreign_key.table_name)
+         )
+     and constraint_state.conname = foreign_key.constraint_name
+    where foreign_key.entity_type = 'artist'
+  ")"
+if [[ "$artist_bootstrap_constraints" != '0' ]]; then
+  printf 'Bootstrap retained %s artist foreign keys; expected 0\n' \
+    "$artist_bootstrap_constraints" >&2
+  exit 1
+fi
+
+docker exec "$container_name" \
+  psql --username migrationtest --dbname migrationtest \
+  --set ON_ERROR_STOP=1 --command "
+    insert into public.artist_alias (alias_id, artist_id, last_modified_at)
+    values (990, 991, now());
+  " >/dev/null
+
+if docker exec "$container_name" \
+  psql --username migrationtest --dbname migrationtest \
+  --set ON_ERROR_STOP=1 --command "
+    select public.finalize_discogs_bootstrap(
+      (select id from public.discogs_import_run
+       where manifest_sha256 = repeat('b', 64))
+    );
+  " >/dev/null 2>&1; then
+  printf 'Bootstrap finalization accepted an invalid artist relation\n' >&2
+  exit 1
+fi
+
+docker exec "$container_name" \
+  psql --username migrationtest --dbname migrationtest \
+  --set ON_ERROR_STOP=1 --command "
+    delete from public.artist_alias where artist_id = 991;
+    select public.finalize_discogs_bootstrap(
+      (select id from public.discogs_import_run
+       where manifest_sha256 = repeat('b', 64))
+    );
+  " >/dev/null
+
+validated_artist_constraints="$(docker exec "$container_name" \
+  psql --username migrationtest --dbname migrationtest \
+  --no-align --tuples-only \
+  --command "
+    select count(*)
+    from public.discogs_bootstrap_foreign_keys() foreign_key
+    join pg_constraint constraint_state
+      on constraint_state.conrelid = to_regclass(
+           format('public.%I', foreign_key.table_name)
+         )
+     and constraint_state.conname = foreign_key.constraint_name
+     and constraint_state.convalidated
+    where foreign_key.entity_type = 'artist'
+  ")"
+if [[ "$validated_artist_constraints" != '8' ]]; then
+  printf 'Bootstrap validated %s artist foreign keys; expected 8\n' \
+    "$validated_artist_constraints" >&2
+  exit 1
+fi
+
+docker exec "$container_name" \
+  psql --username migrationtest --dbname migrationtest \
+  --set ON_ERROR_STOP=1 --command "
+    update public.discogs_catalog_entity_state
+    set status = 'bootstrap_pending',
+        operation = 'bootstrap',
+        active_import_run_id = null
+    where entity_type = 'artist';
+    update public.discogs_import_run
+    set status = 'failed', completed_at = now(), failure_message = 'fixture'
+    where manifest_sha256 = repeat('b', 64);
+  " >/dev/null
 
 entity_state="$(docker exec "$container_name" \
   psql --username migrationtest --dbname migrationtest \
