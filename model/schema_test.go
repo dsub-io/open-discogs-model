@@ -8,8 +8,8 @@ import (
 func TestTableNames(t *testing.T) {
 	t.Parallel()
 
-	if len(TableNames) != 33 {
-		t.Fatalf("table count = %d, want 33", len(TableNames))
+	if len(TableNames) != 35 {
+		t.Fatalf("table count = %d, want 35", len(TableNames))
 	}
 
 	seen := make(map[string]struct{}, len(TableNames))
@@ -22,6 +22,8 @@ func TestTableNames(t *testing.T) {
 
 	for _, required := range []string{
 		"artist",
+		"discogs_catalog_entity_state",
+		"discogs_catalog_readiness",
 		"discogs_dump",
 		"discogs_import_checkpoint",
 		"discogs_import_run_chunk",

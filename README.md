@@ -186,6 +186,14 @@ observation time of the most recent canonical payload or ordinal mutation;
 unchanged refreshes do not advance it. Root entity creation and mutation
 timestamps are unchanged.
 
+V040 adds durable per-entity catalog state. A database without a successful
+checkpoint begins in `bootstrap_pending`; starting an import records whether it
+is a `bootstrap` or `refresh`, and only successful post-load finalization may
+move the entity to `ready`. `discogs_catalog_readiness.ready` is true only when
+Artist, Label, Master, and Release are all ready. Existing databases adopt only
+entities backed by a successful canonical import checkpoint; unknown or partial
+legacy state remains unavailable until a verified import completes.
+
 ## Development
 
 The complete local verification requires Docker, Go 1.26, and Temurin 21.

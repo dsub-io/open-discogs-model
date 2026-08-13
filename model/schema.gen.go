@@ -12,6 +12,8 @@ var TableNames = []string{
 	"artist_member",
 	"artist_name_variation",
 	"artist_url",
+	"discogs_catalog_entity_state",
+	"discogs_catalog_readiness",
 	"discogs_dump",
 	"discogs_import_checkpoint",
 	"discogs_import_run",
@@ -116,6 +118,33 @@ type ArtistURL struct {
 
 // TableName returns the PostgreSQL table represented by ArtistURL.
 func (ArtistURL) TableName() string { return "artist_url" }
+
+// DiscogsCatalogEntityState represents a row in discogs_catalog_entity_state.
+type DiscogsCatalogEntityState struct {
+	EntityType                string     `db:"entity_type" json:"entity_type" gorm:"column:entity_type;primaryKey"`
+	Status                    string     `db:"status" json:"status" gorm:"column:status"`
+	Operation                 *string    `db:"operation" json:"operation" gorm:"column:operation"`
+	ActiveImportRunID         *int64     `db:"active_import_run_id" json:"active_import_run_id" gorm:"column:active_import_run_id"`
+	LastSuccessfulImportRunID *int64     `db:"last_successful_import_run_id" json:"last_successful_import_run_id" gorm:"column:last_successful_import_run_id"`
+	ReadyAt                   *time.Time `db:"ready_at" json:"ready_at" gorm:"column:ready_at"`
+	UpdatedAt                 time.Time  `db:"updated_at" json:"updated_at" gorm:"column:updated_at"`
+	FailureMessage            *string    `db:"failure_message" json:"failure_message" gorm:"column:failure_message"`
+}
+
+// TableName returns the PostgreSQL table represented by DiscogsCatalogEntityState.
+func (DiscogsCatalogEntityState) TableName() string { return "discogs_catalog_entity_state" }
+
+// DiscogsCatalogReadiness represents a row in discogs_catalog_readiness.
+type DiscogsCatalogReadiness struct {
+	Ready            *bool      `db:"ready" json:"ready" gorm:"column:ready"`
+	Status           *string    `db:"status" json:"status" gorm:"column:status"`
+	ReadyEntities    *int64     `db:"ready_entities" json:"ready_entities" gorm:"column:ready_entities"`
+	RequiredEntities *int64     `db:"required_entities" json:"required_entities" gorm:"column:required_entities"`
+	UpdatedAt        *time.Time `db:"updated_at" json:"updated_at" gorm:"column:updated_at"`
+}
+
+// TableName returns the PostgreSQL table represented by DiscogsCatalogReadiness.
+func (DiscogsCatalogReadiness) TableName() string { return "discogs_catalog_readiness" }
 
 // DiscogsDump represents a row in discogs_dump.
 type DiscogsDump struct {

@@ -234,6 +234,8 @@ tasks.register('validateGeneratedSchema') {
         def expectedSources = [
                 'io/dsub/opendiscogs/jooq/Tables.java',
                 'io/dsub/opendiscogs/jooq/tables/Artist.java',
+                'io/dsub/opendiscogs/jooq/tables/DiscogsCatalogEntityState.java',
+                'io/dsub/opendiscogs/jooq/tables/DiscogsCatalogReadiness.java',
                 'io/dsub/opendiscogs/jooq/tables/DiscogsDump.java',
                 'io/dsub/opendiscogs/jooq/tables/DiscogsImportCheckpoint.java',
                 'io/dsub/opendiscogs/jooq/tables/DiscogsImportRun.java',
@@ -243,6 +245,7 @@ tasks.register('validateGeneratedSchema') {
                 'io/dsub/opendiscogs/jooq/tables/Master.java',
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItem.java',
                 'io/dsub/opendiscogs/jooq/tables/records/ArtistRecord.java',
+                'io/dsub/opendiscogs/jooq/tables/records/DiscogsCatalogEntityStateRecord.java',
                 'io/dsub/opendiscogs/jooq/tables/records/DiscogsDumpRecord.java',
                 'io/dsub/opendiscogs/jooq/tables/records/DiscogsImportCheckpointRecord.java',
                 'io/dsub/opendiscogs/jooq/tables/records/DiscogsImportRunRecord.java',
