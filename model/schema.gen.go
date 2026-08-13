@@ -89,10 +89,11 @@ func (ArtistMember) TableName() string { return "artist_member" }
 
 // ArtistNameVariation represents a row in artist_name_variation.
 type ArtistNameVariation struct {
-	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
-	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
-	NameVariation  string    `db:"name_variation" json:"name_variation" gorm:"column:name_variation"`
-	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
+	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
+	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
+	NameVariation  string        `db:"name_variation" json:"name_variation" gorm:"column:name_variation"`
+	ArtistID       int32         `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
+	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ArtistNameVariation.
@@ -100,10 +101,11 @@ func (ArtistNameVariation) TableName() string { return "artist_name_variation" }
 
 // ArtistURL represents a row in artist_url.
 type ArtistURL struct {
-	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
-	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
-	URL            string    `db:"url" json:"url" gorm:"column:url"`
-	ArtistID       int32     `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
+	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
+	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
+	URL            string        `db:"url" json:"url" gorm:"column:url"`
+	ArtistID       int32         `db:"artist_id" json:"artist_id" gorm:"column:artist_id"`
+	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by ArtistURL.
@@ -264,10 +266,11 @@ func (LabelSubLabel) TableName() string { return "label_sub_label" }
 
 // LabelURL represents a row in label_url.
 type LabelURL struct {
-	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
-	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
-	URL            string    `db:"url" json:"url" gorm:"column:url"`
-	LabelID        int32     `db:"label_id" json:"label_id" gorm:"column:label_id"`
+	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
+	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
+	URL            string        `db:"url" json:"url" gorm:"column:url"`
+	LabelID        int32         `db:"label_id" json:"label_id" gorm:"column:label_id"`
+	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by LabelURL.
@@ -319,12 +322,13 @@ func (MasterStyle) TableName() string { return "master_style" }
 
 // MasterVideo represents a row in master_video.
 type MasterVideo struct {
-	LastModifiedAt time.Time `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
-	Hash           int32     `db:"hash" json:"hash" gorm:"column:hash"`
-	Description    *string   `db:"description" json:"description" gorm:"column:description"`
-	Title          *string   `db:"title" json:"title" gorm:"column:title"`
-	URL            *string   `db:"url" json:"url" gorm:"column:url"`
-	MasterID       int32     `db:"master_id" json:"master_id" gorm:"column:master_id"`
+	LastModifiedAt time.Time     `db:"last_modified_at" json:"last_modified_at" gorm:"column:last_modified_at"`
+	Hash           int32         `db:"hash" json:"hash" gorm:"column:hash"`
+	Description    *string       `db:"description" json:"description" gorm:"column:description"`
+	Title          *string       `db:"title" json:"title" gorm:"column:title"`
+	URL            *string       `db:"url" json:"url" gorm:"column:url"`
+	MasterID       int32         `db:"master_id" json:"master_id" gorm:"column:master_id"`
+	IdentitySHA256 *SHA256Digest `db:"identity_sha256" json:"identity_sha256" gorm:"column:identity_sha256"`
 }
 
 // TableName returns the PostgreSQL table represented by MasterVideo.

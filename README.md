@@ -101,10 +101,11 @@ Each `discogs_import_run_dump` row also records the entity-specific import
 contract revision. Successful checkpoints are reusable across Java and Go only
 at the current entity revision; interrupted runs use that same revision rather
 than processor identity to determine cross-language compatibility. V009
-preserves existing rows at revision `1` and
-sets the release convergence contract to revision `2`. Importers that implement
-V010-V016 relation identity use `artist=1`, `label=1`, `master=1`, and
-`release=3`.
+preserves existing rows at revision `1` and sets the release convergence
+contract to revision `2`. V010-V016 release relation identity uses `release=3`.
+V021 non-release relation identity uses `artist=2`, `label=2`, and `master=2`;
+revision 1 progress and successful checkpoints for those entities cannot be
+resumed or skipped.
 Application-specific Spring Batch metadata and query logic do not belong to
 this module.
 
@@ -167,6 +168,16 @@ backfill `release_item_image`; a future image source requires its own policy and
 import boundary. Digest-index cutover for that table remains blocked until a
 bounded maintenance job backfills surviving `file_name` rows; rows already lost
 to a legacy 32-bit collision cannot be reconstructed from the database alone.
+
+Artist name variations, artist URLs, label URLs, and master videos store the
+SHA-256 identity defined by
+[`non-release-relation-identity-v1`](schema/contracts/non-release-relation-identity-v1.md).
+V021 follows the same online transition as release relations: nullable,
+unindexed digests with unvalidated length checks preserve legacy rows and the
+existing `unique (owner, hash)` targets. Revision 2 Artist, Label, and Master
+importers reconcile each owner transactionally and allocate deterministic
+compatibility slots when distinct payloads share a legacy signed 32-bit hash.
+The migration neither scans nor rewrites the relation tables.
 
 Discogs format quantity can exceed a signed 32-bit integer. V011 preserves the
 canonical decimal value in `release_item_format.quantity_text`; the existing

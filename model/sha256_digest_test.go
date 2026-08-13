@@ -65,9 +65,13 @@ func TestSHA256DigestRejectsInvalidValues(t *testing.T) {
 	}
 }
 
-func TestReleaseRelationModelsRemainComparable(t *testing.T) {
+func TestDigestRelationModelsRemainComparable(t *testing.T) {
 	t.Parallel()
 
+	requireComparable(ArtistNameVariation{})
+	requireComparable(ArtistURL{})
+	requireComparable(LabelURL{})
+	requireComparable(MasterVideo{})
 	requireComparable(ReleaseItemCreditedArtist{})
 	requireComparable(ReleaseItemFormat{})
 	requireComparable(ReleaseItemIdentifier{})

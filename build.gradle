@@ -265,7 +265,15 @@ tasks.register('validateGeneratedSchema') {
                             + missingSources.join('\n - '))
         }
 
-        def requiredRelationFields = [
+        def requiredIdentityFields = [
+                'io/dsub/opendiscogs/jooq/tables/ArtistNameVariation.java':
+                        ['TableField<ArtistNameVariationRecord, byte[]> IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/ArtistUrl.java':
+                        ['TableField<ArtistUrlRecord, byte[]> IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/LabelUrl.java':
+                        ['TableField<LabelUrlRecord, byte[]> IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/MasterVideo.java':
+                        ['TableField<MasterVideoRecord, byte[]> IDENTITY_SHA256'],
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItemCreditedArtist.java':
                         ['TableField<ReleaseItemCreditedArtistRecord, byte[]> IDENTITY_SHA256'],
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItemFormat.java':
@@ -284,7 +292,7 @@ tasks.register('validateGeneratedSchema') {
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItemWork.java':
                         ['TableField<ReleaseItemWorkRecord, byte[]> IDENTITY_SHA256']
         ]
-        def missingRelationFields = requiredRelationFields.collectMany { path, fragments ->
+        def missingIdentityFields = requiredIdentityFields.collectMany { path, fragments ->
             def source = generatedDirectory.file(path).asFile
             if (!source.isFile()) {
                 return ["${path}: missing source"]
@@ -293,10 +301,10 @@ tasks.register('validateGeneratedSchema') {
             return fragments.findAll { !text.contains(it) }
                     .collect { "${path}: ${it}" }
         }
-        if (!missingRelationFields.isEmpty()) {
+        if (!missingIdentityFields.isEmpty()) {
             throw new GradleException(
-                    "Generated schema is missing release relation fields:\n - "
-                            + missingRelationFields.join('\n - '))
+                    "Generated schema is missing relation identity fields:\n - "
+                            + missingIdentityFields.join('\n - '))
         }
     }
 }
