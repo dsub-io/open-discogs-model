@@ -6,6 +6,33 @@
 ### Bug Fixes
 
 * preserve canonical relation identities and import state ([#57](https://github.com/dsub-io/open-discogs-model/issues/57)) ([3d4b66e](https://github.com/dsub-io/open-discogs-model/commit/3d4b66e4f5394965986afc96a49b246888ed630a))
+  * preserve distinct release format quantities, label catalog numbers, and
+    relation payloads that share a legacy 32-bit hash
+  * make PostgreSQL natural keys, Go dedupe, Java dedupe, and stale
+    reconciliation use the same canonical identity
+  * share migration checksums, import-contract revisions, progress ownership,
+    and durable catalog readiness between the Go and Java batch processors
+
+### Performance Improvements
+
+* remove relation creation timestamps and unused surrogate relation primary
+  keys from the write path
+* defer 37 eligible bootstrap foreign keys until post-load creation and
+  validation, avoiding row-by-row FK probes while preserving readiness safety
+
+### Verification
+
+* canonical migration inventory, checksum, generated jOOQ, and publication
+  metadata checks passed
+* PostgreSQL tests cover clean bootstrap, migration adoption, collision-safe
+  identity vectors, post-load FK validation, and Go/Java resume compatibility
+
+### Upgrade notes
+
+* Go and Java batch processors must consume this same `0.3.1` model release;
+  do not mix the new relation writers with an older canonical schema
+* deferred foreign keys are restored and validated before catalog readiness;
+  operators should not serve a bootstrap database until readiness is true
 
 ## [0.3.0](https://github.com/dsub-io/open-discogs-model/compare/v0.2.3...v0.3.0) (2026-08-12)
 
