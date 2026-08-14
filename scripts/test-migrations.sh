@@ -133,7 +133,7 @@ if [[ "$row_count" != 3 ]]; then
   exit 1
 fi
 
-for version in $(seq -f '%03g' 9 21); do
+for version in $(seq -f '%03g' 9 23); do
   migration="$(find "$repository_root/schema/migrations" \
     -maxdepth 1 -type f -name "V${version}__*.sql" -print -quit)"
   if [[ -z "$migration" ]]; then
@@ -144,6 +144,28 @@ for version in $(seq -f '%03g' 9 21); do
     psql --username migrationtest --dbname migrationtest \
     --set ON_ERROR_STOP=1 < "$migration" >/dev/null
 done
+
+exact_lookup_indexes="$(docker exec "$container_name" \
+  psql --username migrationtest --dbname migrationtest \
+  --no-align --tuples-only \
+  --command "
+    select indexname
+    from pg_indexes
+    where schemaname = 'public'
+      and indexname in (
+        'ix_label_release_item_label_catalog_release',
+        'ix_release_item_identifier_type_value_release'
+      )
+    order by indexname
+  ")"
+expected_exact_lookup_indexes="$(printf '%s\n' \
+  'ix_label_release_item_label_catalog_release' \
+  'ix_release_item_identifier_type_value_release')"
+if [[ "$exact_lookup_indexes" != "$expected_exact_lookup_indexes" ]]; then
+  printf 'Unexpected exact lookup index inventory:\n%s\n' \
+    "$exact_lookup_indexes" >&2
+  exit 1
+fi
 
 non_release_identity_inventory="$(docker exec "$container_name" \
   psql --username migrationtest --dbname migrationtest \
