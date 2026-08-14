@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/dsub-io/open-discogs-model/compare/v0.3.2...v0.4.0) (2026-08-14)
+
+
+### Features
+
+* add exact release lookup indexes ([#63](https://github.com/dsub-io/open-discogs-model/issues/63)) ([d569f58](https://github.com/dsub-io/open-discogs-model/commit/d569f58a44560ecf45e2f3a2f20de7e69613a7ca))
+
 ## [0.3.2](https://github.com/dsub-io/open-discogs-model/compare/v0.3.1...v0.3.2) (2026-08-13)
 
 
