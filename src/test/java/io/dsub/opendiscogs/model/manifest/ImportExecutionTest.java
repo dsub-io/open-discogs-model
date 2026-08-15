@@ -13,11 +13,11 @@ class ImportExecutionTest {
 
   @Test
   void exposesPositivePerEntityImportContractRevisions() {
-    assertEquals(1, ImportExecution.importContractRevision("artist"));
-    assertEquals(1, ImportExecution.importContractRevision("label"));
-    assertEquals(1, ImportExecution.importContractRevision("master"));
-    assertEquals(2, ImportExecution.importContractRevision("release"));
-    assertEquals(2, ImportExecution.importContractRevision("RELEASE"));
+    assertEquals(2, ImportExecution.importContractRevision("artist"));
+    assertEquals(2, ImportExecution.importContractRevision("label"));
+    assertEquals(2, ImportExecution.importContractRevision("master"));
+    assertEquals(3, ImportExecution.importContractRevision("release"));
+    assertEquals(3, ImportExecution.importContractRevision("RELEASE"));
     assertTrue(ImportExecution.importContractRevision("release") > 0);
     assertThrows(
         IllegalArgumentException.class,

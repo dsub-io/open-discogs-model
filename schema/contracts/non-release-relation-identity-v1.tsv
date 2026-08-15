@@ -1,0 +1,9 @@
+kind	id	relation	field_1	field_2	field_3	identity_sha256	attempt	slot	legacy_java_hash
+digest	artist_name_variation_aa	artist_name_variation	hex:4161	-	-	9ea73f5c741d87f3051cb2a720c3123d0d4897ae48b2c0ae6d9bdcd88ff1afee	-	-	2112
+digest	artist_name_variation_bb	artist_name_variation	hex:4242	-	-	fb6210e9ce991c5e2e8eefd55acfc5c5b7afbd73cf626787a8fd2f57517039ff	-	-	2112
+digest	artist_name_variation_unicode_trim	artist_name_variation	hex:e38080426ac3b6726b09	-	-	bc78f9392c0aa5c77c864da428ed37b6cd0e1e85f4fcfd47fe02aa17290c6aa6	-	-	-
+digest	artist_url_trim	artist_url	hex:2068747470733a2f2f6578616d706c652e696e76616c69642f6120	-	-	af8d53f6ddb3075a5b35dd0178d3e989c110b2ebcc887e6c5d4f255e96b51254	-	-	-
+digest	label_url_non_bmp	label_url	hex:68747470733a2f2f6578616d706c652e696e76616c69642ff09f9880	-	-	d9efe86680aa0a27ec42f0cd221bf96683d836d558e067c1e8bc2096270782cd	-	-	-
+digest	master_video_blank_description	master_video	hex:2044656d6f20	hex:e28083	hex:2068747470733a2f2f6578616d706c652e696e76616c69642f77617463683f763d3120	16d21f017b0d5685e550ac5e428ab00ed0648da01b47335dde7a716e0308cdce	-	-	-
+slot	artist_name_variation_aa_attempt_0	artist_name_variation	-	-	-	9ea73f5c741d87f3051cb2a720c3123d0d4897ae48b2c0ae6d9bdcd88ff1afee	0	-851983164	-
+slot	artist_name_variation_aa_attempt_1	artist_name_variation	-	-	-	9ea73f5c741d87f3051cb2a720c3123d0d4897ae48b2c0ae6d9bdcd88ff1afee	1	1091717935	-

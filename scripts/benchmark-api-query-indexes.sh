@@ -177,6 +177,7 @@ keyset_query="select id from release_item where id > $((release_rows - 100)) ord
 exact_count_query="select count(*) from release_item"
 title_query="select id from release_item where title ilike '%rare needle%' and id > 0 order by id limit 31"
 relationship_query="select release_item_id from release_item_artist where artist_id = $((artist_rows - 1)) and release_item_id > 0 order by release_item_id limit 31"
+combined_release_query="select id from release_item where lower(country) = 'gb' and has_valid_year is true and release_date >= date '2000-03-01' and release_date < date '2000-04-01' and is_master is true and id > 0 order by id limit 31"
 
 printf 'phase\tquery\tp50_ms\tp95_ms\tp99_ms\n'
 benchmark_query before deep_offset "$deep_offset_query"
@@ -198,6 +199,18 @@ psql_command 'analyze;'
 benchmark_query after keyset "$keyset_query"
 benchmark_query after title_contains "$title_query"
 benchmark_query after artist_releases "$relationship_query"
+benchmark_query before_composite release_combined_filter "$combined_release_query"
 printf 'plan_after\ttitle_contains\t%s\n' "$(query_plan "$title_query")"
 printf 'plan_after\tartist_releases\t%s\n' "$(query_plan "$relationship_query")"
 printf 'size_after_bytes\t%s\n' "$(psql_command "select pg_database_size(current_database())")"
+
+docker exec --interactive "$container_name" \
+  psql --username modelbench --dbname modelbench \
+    --no-psqlrc --quiet --set ON_ERROR_STOP=1 \
+    < "$repository_root/schema/migrations/V022__release_combined_filter_index.sql"
+psql_command 'analyze release_item;'
+
+benchmark_query after_composite release_combined_filter "$combined_release_query"
+printf 'plan_after_composite\trelease_combined_filter\t%s\n' "$(query_plan "$combined_release_query")"
+printf 'combined_index_bytes\t%s\n' "$(psql_command "select pg_relation_size('ix_release_item_country_master_id_date')")"
+printf 'size_after_composite_bytes\t%s\n' "$(psql_command "select pg_database_size(current_database())")"

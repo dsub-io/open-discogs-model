@@ -91,10 +91,13 @@ trap 'exit 143' TERM
 wait_for_postgres() {
   local container_name=$1
 
-  for _ in {1..30}; do
-    if docker exec "$container_name" \
-      psql --username postgres --dbname postgres \
-      --no-psqlrc --tuples-only --command 'select 1' >/dev/null 2>&1; then
+  # The temporary init server accepts SQL before the entrypoint starts the final PID 1 server.
+  for _ in {1..60}; do
+    if docker exec "$container_name" sh -ceu '
+      test "$(cat /proc/1/comm)" = postgres
+      exec psql --username postgres --dbname postgres \
+        --no-psqlrc --tuples-only --command "select 1"
+    ' >/dev/null 2>&1; then
       return 0
     fi
     sleep 1
@@ -134,6 +137,26 @@ apply_v009() {
     >/dev/null
 }
 
+apply_release_identity_migrations() {
+  local container_name=$1
+  local database_name=$2
+  local version
+  local migration
+
+  for version in 010 011 012 013 014 015 016; do
+    migration="$(find "$repository_root/schema/migrations" \
+      -maxdepth 1 -type f -name "V${version}__*.sql" -print -quit)"
+    if [[ -z "$migration" ]]; then
+      printf 'Missing migration V%s\n' "$version" >&2
+      return 1
+    fi
+    docker exec --interactive "$container_name" \
+      psql --username postgres --dbname "$database_name" \
+      --no-psqlrc --set ON_ERROR_STOP=1 --single-transaction \
+      < "$migration" >/dev/null
+  done
+}
+
 execute_sql() {
   local container_name=$1
   local database_name=$2
@@ -160,6 +183,27 @@ assert_scalar() {
       "$database_name" "$expected" "$actual" >&2
     return 1
   fi
+}
+
+relation_heap_nodes() {
+  local container_name=$1
+  local database_name=$2
+
+  docker exec "$container_name" \
+    psql --username postgres --dbname "$database_name" \
+    --no-psqlrc --no-align --tuples-only --set ON_ERROR_STOP=1 \
+    --command "
+      select string_agg(relname || ':' || relfilenode::text, ',' order by relname)
+      from pg_class
+      where oid in (
+        'public.release_item_credited_artist'::regclass,
+        'public.release_item_format'::regclass,
+        'public.release_item_identifier'::regclass,
+        'public.release_item_image'::regclass,
+        'public.release_item_track'::regclass,
+        'public.release_item_video'::regclass,
+        'public.release_item_work'::regclass
+      );"
 }
 
 expect_sql_failure() {
@@ -227,6 +271,10 @@ seed_valid_release_relationships() {
   local database_name=$2
 
   execute_sql "$container_name" "$database_name" "
+    insert into public.artist (id, created_at, last_modified_at)
+    values (10, now(), now());
+    insert into public.label (id, created_at, last_modified_at)
+    values (20, now(), now());
     insert into public.master (id, created_at, last_modified_at)
     values (1, now(), now()), (2, now(), now());
     insert into public.release_item (
@@ -237,7 +285,253 @@ seed_valid_release_relationships() {
     update public.master
     set main_release_id = case id when 1 then 101 when 2 then 102 end
     where id in (1, 2);
+
+    insert into public.release_item_credited_artist (
+      id, created_at, last_modified_at, hash, role, artist_id, release_item_id
+    ) values (1001, now(), now(), 1, 'Producer', 10, 101);
+    insert into public.release_item_format (
+      id, created_at, last_modified_at, hash, name, quantity, release_item_id
+    ) values (1002, now(), now(), 2, 'CD', 1, 101);
+    insert into public.release_item_identifier (
+      id, created_at, last_modified_at, hash, type, value, release_item_id
+    ) values (1003, now(), now(), 3, 'Barcode', '123', 101);
+    insert into public.release_item_image (
+      id, created_at, last_modified_at, hash, file_name, release_item_id
+    ) values (1007, now(), now(), 7, 'cover.jpg', 101);
+    insert into public.release_item_track (
+      id, created_at, last_modified_at, hash, position, title, release_item_id
+    ) values (1004, now(), now(), 4, '1', 'Track', 101);
+    insert into public.release_item_video (
+      id, created_at, last_modified_at, hash, title, url, release_item_id
+    ) values (1005, now(), now(), 5, 'Video', 'https://example.invalid', 101);
+    insert into public.release_item_work (
+      id, created_at, last_modified_at, hash, work, label_id, release_item_id
+    ) values (1006, now(), now(), 6, 'Published By', 20, 101);
   "
+}
+
+validate_release_relation_identity_migration() {
+  local container_name=$1
+  local database_name=$2
+
+  assert_scalar "$container_name" "$database_name" "
+    select count(*)
+    from information_schema.columns
+    where table_schema = 'public'
+      and column_name = 'identity_sha256'
+      and table_name in (
+        'release_item_credited_artist',
+        'release_item_format',
+        'release_item_identifier',
+        'release_item_image',
+        'release_item_track',
+        'release_item_video',
+        'release_item_work'
+      )
+      and data_type = 'bytea'
+      and is_nullable = 'YES'
+  " "7"
+  assert_scalar "$container_name" "$database_name" "
+    select count(*)
+    from pg_constraint
+    where conname like 'ck_release_item_%_identity_sha256_length'
+      and not convalidated
+  " "7"
+  assert_scalar "$container_name" "$database_name" "
+    select count(*)
+    from pg_indexes
+    where schemaname = 'public'
+      and indexdef like '%identity_sha256%'
+  " "0"
+  assert_scalar "$container_name" "$database_name" "
+    select string_agg(id::text, ',' order by id)
+    from (
+      select id from public.release_item_credited_artist
+      union all select id from public.release_item_format
+      union all select id from public.release_item_identifier
+      union all select id from public.release_item_image
+      union all select id from public.release_item_track
+      union all select id from public.release_item_video
+      union all select id from public.release_item_work
+    ) relation_rows
+  " "1001,1002,1003,1004,1005,1006,1007"
+  assert_scalar "$container_name" "$database_name" "
+    select count(*)
+    from (
+      select identity_sha256 from public.release_item_credited_artist
+      union all select identity_sha256 from public.release_item_format
+      union all select identity_sha256 from public.release_item_identifier
+      union all select identity_sha256 from public.release_item_image
+      union all select identity_sha256 from public.release_item_track
+      union all select identity_sha256 from public.release_item_video
+      union all select identity_sha256 from public.release_item_work
+    ) relation_rows
+    where identity_sha256 is null
+  " "7"
+  expect_sql_failure "$container_name" "$database_name" "
+    update public.release_item_track
+    set identity_sha256 = decode(repeat('00', 31), 'hex')
+    where id = 1004;
+  "
+  execute_sql "$container_name" "$database_name" "
+    update public.release_item_track
+    set identity_sha256 = decode(repeat('00', 32), 'hex')
+    where id = 1004;
+  "
+  assert_scalar "$container_name" "$database_name" "
+    select octet_length(identity_sha256)
+    from public.release_item_track
+    where id = 1004
+  " "32"
+}
+
+validate_release_format_quantity_migration() {
+  local container_name=$1
+  local database_name=$2
+  local oversized_quantity="1010487400000000000000000000000000000000000000000000"
+
+  assert_scalar "$container_name" "$database_name" "
+    select count(*)
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'release_item_format'
+      and column_name = 'quantity_text'
+      and data_type = 'text'
+      and is_nullable = 'YES'
+  " "1"
+  assert_scalar "$container_name" "$database_name" "
+    select count(*)
+    from pg_constraint
+    where conrelid = 'public.release_item_format'::regclass
+      and conname in (
+        'ck_release_item_format_quantity_text_decimal',
+        'ck_release_item_format_quantity_consistent'
+      )
+      and not convalidated
+  " "2"
+  assert_scalar "$container_name" "$database_name" "
+    select quantity::text || ':' || coalesce(quantity_text, 'null')
+    from public.release_item_format
+    where id = 1002
+  " "1:null"
+  expect_sql_failure "$container_name" "$database_name" "
+    update public.release_item_format
+    set quantity_text = '01'
+    where id = 1002;
+  "
+  expect_sql_failure "$container_name" "$database_name" "
+    update public.release_item_format
+    set identity_sha256 = decode(repeat('00', 32), 'hex'),
+        quantity_text = null
+    where id = 1002;
+  "
+  expect_sql_failure "$container_name" "$database_name" "
+    update public.release_item_format
+    set identity_sha256 = decode(repeat('00', 32), 'hex'),
+        quantity_text = '2'
+    where id = 1002;
+  "
+  expect_sql_failure "$container_name" "$database_name" "
+    update public.release_item_format
+    set identity_sha256 = decode(repeat('00', 32), 'hex'),
+        quantity = null,
+        quantity_text = '1'
+    where id = 1002;
+  "
+  execute_sql "$container_name" "$database_name" "
+    update public.release_item_format
+    set identity_sha256 = decode(repeat('00', 32), 'hex'),
+        quantity_text = '1'
+    where id = 1002;
+  "
+  expect_sql_failure "$container_name" "$database_name" "
+    update public.release_item_format
+    set quantity = 1,
+        quantity_text = '$oversized_quantity'
+    where id = 1002;
+  "
+  execute_sql "$container_name" "$database_name" "
+    update public.release_item_format
+    set quantity = null,
+        quantity_text = '$oversized_quantity'
+    where id = 1002;
+  "
+  assert_scalar "$container_name" "$database_name" "
+    select quantity_text
+    from public.release_item_format
+    where id = 1002
+  " "$oversized_quantity"
+  assert_scalar "$container_name" "$database_name" "show lock_timeout" "0"
+}
+
+validate_identity_migration_lock_timeout() {
+  local container_name=$1
+  local database_name=$2
+  local application_name="open-discogs-model-lock-holder-$test_run"
+  local holder_pid
+  local lock_ready=false
+  local migration_error
+
+  docker exec --env "PGAPPNAME=$application_name" "$container_name" \
+    psql --username postgres --dbname "$database_name" --no-psqlrc \
+    --set ON_ERROR_STOP=1 \
+    --command "
+      begin;
+      lock table public.release_item_credited_artist in access share mode;
+      select pg_sleep(30);
+      commit;
+    " >/dev/null 2>&1 &
+  holder_pid=$!
+
+  for _ in {1..100}; do
+    if [[ "$(docker exec "$container_name" \
+      psql --username postgres --dbname "$database_name" \
+      --no-psqlrc --no-align --tuples-only \
+      --command "
+        select count(*)
+        from pg_locks lock_state
+        join pg_stat_activity activity on activity.pid = lock_state.pid
+        where activity.application_name = '$application_name'
+          and lock_state.relation =
+            'public.release_item_credited_artist'::regclass
+          and lock_state.mode = 'AccessShareLock'
+          and lock_state.granted;")" == "1" ]]; then
+      lock_ready=true
+      break
+    fi
+    sleep 0.1
+  done
+  if [[ "$lock_ready" != true ]]; then
+    printf 'Lock holder did not acquire the relation lock\n' >&2
+    return 1
+  fi
+
+  if migration_error="$(docker exec --interactive "$container_name" \
+    psql --username postgres --dbname "$database_name" \
+    --no-psqlrc --set ON_ERROR_STOP=1 --single-transaction \
+    < "$repository_root/schema/migrations/V010__release_credited_artist_identity.sql" \
+    2>&1 >/dev/null)"; then
+    printf 'V010 unexpectedly waited through lock contention\n' >&2
+    return 1
+  fi
+  if [[ "$migration_error" != *"canceling statement due to lock timeout"* ]]; then
+    printf 'V010 failed for an unexpected reason: %s\n' "$migration_error" >&2
+    return 1
+  fi
+  assert_scalar "$container_name" "$database_name" "
+    select count(*)
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'release_item_credited_artist'
+      and column_name = 'identity_sha256'
+  " "0"
+
+  execute_sql "$container_name" "$database_name" "
+    select pg_terminate_backend(pid)
+    from pg_stat_activity
+    where application_name = '$application_name';
+  "
+  wait "$holder_pid" || true
 }
 
 validate_successful_migration() {
@@ -491,6 +785,8 @@ run_postgres_contract_test() {
   local container_name
   local volume_mounts
   local assert_tmpfs
+  local heap_nodes_before
+  local heap_nodes_after
   local database_name
   local tmpfs_path
   local pgdata_path="/var/lib/postgresql/data"
@@ -544,7 +840,8 @@ run_postgres_contract_test() {
 
   wait_for_postgres "$container_name"
 
-  for database_name in contract_good contract_bad_mismatch contract_bad_duplicate; do
+  for database_name in \
+    contract_good contract_bad_mismatch contract_bad_duplicate contract_lock; do
     execute_sql "$container_name" postgres "create database $database_name;"
     apply_migrations_through_v008 "$container_name" "$database_name"
     seed_import_run "$container_name" "$database_name"
@@ -553,6 +850,19 @@ run_postgres_contract_test() {
   seed_valid_release_relationships "$container_name" contract_good
   apply_v009 "$container_name" contract_good
   validate_successful_migration "$container_name" contract_good
+  heap_nodes_before="$(relation_heap_nodes "$container_name" contract_good)"
+  apply_release_identity_migrations "$container_name" contract_good
+  heap_nodes_after="$(relation_heap_nodes "$container_name" contract_good)"
+  if [[ "$heap_nodes_after" != "$heap_nodes_before" ]]; then
+    printf 'Release relation heap rewrite detected: before=%s after=%s\n' \
+      "$heap_nodes_before" "$heap_nodes_after" >&2
+    return 1
+  fi
+  validate_release_relation_identity_migration "$container_name" contract_good
+  validate_release_format_quantity_migration "$container_name" contract_good
+
+  apply_v009 "$container_name" contract_lock
+  validate_identity_migration_lock_timeout "$container_name" contract_lock
 
   execute_sql "$container_name" contract_bad_mismatch "
     insert into public.master (id, created_at, last_modified_at)

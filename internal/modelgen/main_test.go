@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -35,6 +36,13 @@ func TestColumnType(t *testing.T) {
 		want   string
 	}{
 		{name: "integer", column: column{dataType: "integer"}, want: "int32"},
+		{
+			name: "nullable SHA-256 digest",
+			column: column{
+				name: "identity_sha256", dataType: "bytea", nullable: true,
+			},
+			want: "*SHA256Digest",
+		},
 		{name: "nullable text", column: column{dataType: "text", nullable: true}, want: "*string"},
 		{name: "timestamp", column: column{dataType: "timestamp without time zone"}, want: "time.Time"},
 	}
@@ -55,6 +63,9 @@ func TestColumnType(t *testing.T) {
 	if _, err := columnType(column{dataType: "jsonb"}); err == nil {
 		t.Error("columnType() accepted unsupported jsonb")
 	}
+	if _, err := columnType(column{name: "payload", dataType: "bytea"}); err == nil {
+		t.Error("columnType() accepted ambiguous bytea")
+	}
 }
 
 func TestReadCatalogAndGenerate(t *testing.T) {
@@ -63,6 +74,7 @@ func TestReadCatalogAndGenerate(t *testing.T) {
 	input := strings.Join([]string{
 		"example\tid\tbigint\tint8\tNO\tnextval('example_id_seq'::regclass)\ttrue\ttrue",
 		"example\tlabel\tcharacter varying\tvarchar\tYES\t\tfalse\tfalse",
+		"example\tidentity_sha256\tbytea\tbytea\tYES\t\tfalse\tfalse",
 	}, "\n")
 	path := filepath.Join(t.TempDir(), "catalog.tsv")
 	if err := os.WriteFile(path, []byte(input), 0o600); err != nil {
@@ -81,13 +93,20 @@ func TestReadCatalogAndGenerate(t *testing.T) {
 	generated := string(source)
 	for _, want := range []string{
 		"type Example struct",
-		"ID    int64",
-		"Label *string",
 		`gorm:"column:id;primaryKey;autoIncrement"`,
 		"func (Example) TableName() string",
 	} {
 		if !strings.Contains(generated, want) {
 			t.Errorf("generated source does not contain %q", want)
+		}
+	}
+	for _, want := range []string{
+		`\bID\s+int64\b`,
+		`\bLabel\s+\*string\b`,
+		`\bIdentitySHA256\s+\*SHA256Digest\b`,
+	} {
+		if !regexp.MustCompile(want).MatchString(generated) {
+			t.Errorf("generated source does not match %q", want)
 		}
 	}
 }

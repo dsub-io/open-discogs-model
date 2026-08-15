@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'org.jooq.jooq-codegen-gradle' version '3.21.6'
+    id 'org.jooq.jooq-codegen-gradle' version '3.21.7'
 }
 
 group = 'io.dsub.opendiscogs'
@@ -31,9 +31,9 @@ sourceSets {
 }
 
 dependencies {
-    api 'org.jooq:jooq:3.21.6'
-    testImplementation 'org.junit.jupiter:junit-jupiter:6.1.2'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.1.2'
+    api 'org.jooq:jooq:3.21.7'
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.1.3'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.1.3'
 
     jooqCodegen(
             'org.slf4j:slf4j-simple:2.0.18',
@@ -234,6 +234,8 @@ tasks.register('validateGeneratedSchema') {
         def expectedSources = [
                 'io/dsub/opendiscogs/jooq/Tables.java',
                 'io/dsub/opendiscogs/jooq/tables/Artist.java',
+                'io/dsub/opendiscogs/jooq/tables/DiscogsCatalogEntityState.java',
+                'io/dsub/opendiscogs/jooq/tables/DiscogsCatalogReadiness.java',
                 'io/dsub/opendiscogs/jooq/tables/DiscogsDump.java',
                 'io/dsub/opendiscogs/jooq/tables/DiscogsImportCheckpoint.java',
                 'io/dsub/opendiscogs/jooq/tables/DiscogsImportRun.java',
@@ -243,6 +245,7 @@ tasks.register('validateGeneratedSchema') {
                 'io/dsub/opendiscogs/jooq/tables/Master.java',
                 'io/dsub/opendiscogs/jooq/tables/ReleaseItem.java',
                 'io/dsub/opendiscogs/jooq/tables/records/ArtistRecord.java',
+                'io/dsub/opendiscogs/jooq/tables/records/DiscogsCatalogEntityStateRecord.java',
                 'io/dsub/opendiscogs/jooq/tables/records/DiscogsDumpRecord.java',
                 'io/dsub/opendiscogs/jooq/tables/records/DiscogsImportCheckpointRecord.java',
                 'io/dsub/opendiscogs/jooq/tables/records/DiscogsImportRunRecord.java',
@@ -261,6 +264,48 @@ tasks.register('validateGeneratedSchema') {
                     "Generated schema is missing required sources:\n - "
                             + missingSources.join('\n - '))
         }
+
+        def requiredIdentityFields = [
+                'io/dsub/opendiscogs/jooq/tables/ArtistNameVariation.java':
+                        ['TableField<ArtistNameVariationRecord, byte[]> IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/ArtistUrl.java':
+                        ['TableField<ArtistUrlRecord, byte[]> IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/LabelUrl.java':
+                        ['TableField<LabelUrlRecord, byte[]> IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/MasterVideo.java':
+                        ['TableField<MasterVideoRecord, byte[]> IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemCreditedArtist.java':
+                        ['TableField<ReleaseItemCreditedArtistRecord, byte[]> IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemFormat.java':
+                        [
+                                'TableField<ReleaseItemFormatRecord, byte[]> IDENTITY_SHA256',
+                                'TableField<ReleaseItemFormatRecord, String> QUANTITY_TEXT'
+                        ],
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemIdentifier.java':
+                        ['TableField<ReleaseItemIdentifierRecord, byte[]> IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemImage.java':
+                        ['TableField<ReleaseItemImageRecord, byte[]> IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemTrack.java':
+                        ['TableField<ReleaseItemTrackRecord, byte[]> IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemVideo.java':
+                        ['TableField<ReleaseItemVideoRecord, byte[]> IDENTITY_SHA256'],
+                'io/dsub/opendiscogs/jooq/tables/ReleaseItemWork.java':
+                        ['TableField<ReleaseItemWorkRecord, byte[]> IDENTITY_SHA256']
+        ]
+        def missingIdentityFields = requiredIdentityFields.collectMany { path, fragments ->
+            def source = generatedDirectory.file(path).asFile
+            if (!source.isFile()) {
+                return ["${path}: missing source"]
+            }
+            def text = source.getText('UTF-8')
+            return fragments.findAll { !text.contains(it) }
+                    .collect { "${path}: ${it}" }
+        }
+        if (!missingIdentityFields.isEmpty()) {
+            throw new GradleException(
+                    "Generated schema is missing relation identity fields:\n - "
+                            + missingIdentityFields.join('\n - '))
+        }
     }
 }
 
@@ -272,14 +317,14 @@ tasks.register('validatePublicationPom') {
     dependsOn(tasks.named('generatePomFileForMavenJavaPublication'))
     inputs.file(publicationPom)
     doLast {
-        def pomText = publicationPom.get().asFile.getText('UTF-8')
+        def pomFile = publicationPom.get().asFile
+        def pomText = pomFile.getText('UTF-8')
         def requiredFragments = [
                 '<groupId>io.dsub.opendiscogs</groupId>',
                 '<artifactId>open-discogs-model-jooq</artifactId>',
                 '<name>state303</name>',
                 '<groupId>org.jooq</groupId>',
-                '<artifactId>jooq</artifactId>',
-                '<version>3.21.6</version>'
+                '<artifactId>jooq</artifactId>'
         ]
         def missingFragments = requiredFragments.findAll {
             !pomText.contains(it)
@@ -288,6 +333,30 @@ tasks.register('validatePublicationPom') {
             throw new GradleException(
                     "Publication POM is missing required metadata:\n - "
                             + missingFragments.join('\n - '))
+        }
+
+        def declaredJooqDependency = configurations.api.dependencies.find {
+            it.group == 'org.jooq' && it.name == 'jooq'
+        }
+        if (declaredJooqDependency == null || declaredJooqDependency.version == null) {
+            throw new GradleException(
+                    'The Java API must declare an explicit org.jooq:jooq version')
+        }
+
+        def pom = new groovy.xml.XmlSlurper(false, false).parse(pomFile)
+        def publishedJooqDependencies = pom.dependencies.dependency.findAll {
+            it.groupId.text() == 'org.jooq' && it.artifactId.text() == 'jooq'
+        }
+        if (publishedJooqDependencies.size() != 1) {
+            throw new GradleException(
+                    'Publication POM must contain exactly one org.jooq:jooq dependency')
+        }
+        def publishedJooqVersion = publishedJooqDependencies[0].version.text()
+        if (publishedJooqVersion != declaredJooqDependency.version) {
+            throw new GradleException(
+                    'Publication POM org.jooq:jooq version does not match the Java API: '
+                            + "published=${publishedJooqVersion}, "
+                            + "declared=${declaredJooqDependency.version}")
         }
     }
 }

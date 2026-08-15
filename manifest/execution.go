@@ -18,10 +18,11 @@ var entityLockKeys = map[string]int32{
 }
 
 var entityImportContractRevisions = map[string]int32{
-	"artist":  1,
-	"label":   1,
-	"master":  1,
-	"release": 2,
+	// Revision 2 adds collision-resistant identities to every hashed non-release relation.
+	"artist":  2,
+	"label":   2,
+	"master":  2,
+	"release": 3,
 }
 
 var entityLockDependencies = map[string][]string{

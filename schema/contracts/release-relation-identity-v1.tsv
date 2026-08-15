@@ -1,0 +1,12 @@
+kind	id	relation	field_1	field_2	field_3	field_4	identity_sha256	attempt	slot	expected
+digest	credited_unicode_trim	credited_artist	hex:09c2a050726f6475636572e38080	-	-	-	0ac529905929fbc1a29ef806f3edab094723c4be65618596746c605ae80749f9	-	-	-
+digest	format_quantity_and_null	format	hex:20434420	hex:5b643a436f6d70696c6174696f6e5d2c5b643a436f6d70696c6174696f6e5d	hex:32	null	7666e670c43e71bd4a2989b31964e3d0bca0ba1534da4b384180d023bd476bef	-	-	-
+digest	identifier_non_bmp	identifier	hex:20426172636f646520	null	hex:2041f09f9880204220	-	96f7df17f57eefd924ab115fa8a6b5e4032bf44b085b739b219fceeff5bc471c	-	-	-
+digest	image_blank	image	hex:e2808309	-	-	-	6b4a59b8cda8311b6a1d0b6395f7a2516367f6d0ac2fd64f348d9587776f05a1	-	-	-
+digest	track_interior_whitespace	track	hex:20413120	hex:547261636b095469746c65	hex:20333a303020	-	3bae2bda429ac1bb63c3b38c0e8fddeb0c13f2bbdf6c12944ab067e65b163c70	-	-	-
+digest	video_url	video	hex:20566964656f20	hex:2044656d6f20	hex:2068747470733a2f2f6578616d706c652e696e76616c69642f77617463683f763d3120	-	b28a8de3ca4d9dcb26b73282370d4ba7d5eef51fe4ac770fd6de2fbd65e95732	-	-	-
+digest	work_unicode	work	hex:e280af5075626c6973686564204279e2819f	-	-	-	1a1090c1adcb514d48760f9ab205058b744ee22ab799aa5ebc9487f0a1e6b536	-	-	-
+slot	credited_unicode_trim_attempt_0	credited_artist	-	-	-	-	0ac529905929fbc1a29ef806f3edab094723c4be65618596746c605ae80749f9	0	-816739110	-
+slot	format_quantity_and_null_attempt_0	format	-	-	-	-	7666e670c43e71bd4a2989b31964e3d0bca0ba1534da4b384180d023bd476bef	0	1373644603	-
+slot	format_quantity_and_null_attempt_1	format	-	-	-	-	7666e670c43e71bd4a2989b31964e3d0bca0ba1534da4b384180d023bd476bef	1	952476449	-
+description	format_description_order	format	hex:20436f6d70696c6174696f6e20	hex:e38080	hex:436f6d70696c6174696f6e	hex:	-	-	-	hex:5b643a436f6d70696c6174696f6e5d2c5b643a436f6d70696c6174696f6e5d

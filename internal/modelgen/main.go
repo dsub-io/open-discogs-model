@@ -161,6 +161,11 @@ func columnType(field column) (string, error) {
 		goType = "int64"
 	case "boolean":
 		goType = "bool"
+	case "bytea":
+		if field.name != "identity_sha256" {
+			return "", fmt.Errorf("unsupported bytea column %q", field.name)
+		}
+		goType = "SHA256Digest"
 	case "character", "character varying", "text":
 		goType = "string"
 	case "date", "timestamp with time zone", "timestamp without time zone":

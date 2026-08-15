@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.dsub.opendiscogs:open-discogs-model-jooq:0.2.3'
+    implementation 'io.dsub.opendiscogs:open-discogs-model-jooq:0.4.0'
 }
 ```
 <!-- x-release-please-end -->
@@ -37,7 +37,7 @@ The Go model is published by the same Git tag as the Maven artifact.
 
 <!-- x-release-please-start-version -->
 ```bash
-go get github.com/dsub-io/open-discogs-model@v0.2.3
+go get github.com/dsub-io/open-discogs-model@v0.4.0
 ```
 <!-- x-release-please-end -->
 
@@ -99,9 +99,13 @@ ledger supports parallel commits without treating gaps as completed work and
 may be pruned once a successful run no longer needs it.
 Each `discogs_import_run_dump` row also records the entity-specific import
 contract revision. Successful checkpoints are reusable across Java and Go only
-at the current entity revision; interrupted runs additionally require the same
-processor name and version. V009 preserves existing rows at revision `1` and
-sets the current contract to `artist=1`, `label=1`, `master=1`, and `release=2`.
+at the current entity revision; interrupted runs use that same revision rather
+than processor identity to determine cross-language compatibility. V009
+preserves existing rows at revision `1` and sets the release convergence
+contract to revision `2`. V010-V016 release relation identity uses `release=3`.
+V021 non-release relation identity uses `artist=2`, `label=2`, and `master=2`;
+revision 1 progress and successful checkpoints for those entities cannot be
+resumed or skipped.
 Application-specific Spring Batch metadata and query logic do not belong to
 this module.
 
@@ -116,8 +120,9 @@ same normalized business state. The `discogs_import_checkpoint` view exposes
 the last successfully applied dump date and provenance for each entity type.
 Progress advances in the same transaction as a root entity's complete
 canonical relation set. A retry may resume only from an identical manifest,
-processor, processor version, entity type, and dump, while forced imports
-always start from zero.
+entity type, dump, chunk size, and import contract revision, while forced
+imports always start from zero. Processor name and version remain provenance,
+not a resume boundary.
 Per-entity PostgreSQL advisory locks allow disjoint imports to run concurrently
 while rejecting overlapping writers. Older dumps are rejected unless a
 separate, audited downgrade option is explicitly requested.
@@ -125,10 +130,21 @@ separate, audited downgrade option is explicitly requested.
 The schema also owns the bounded read-path indexes used by the Go API. Trigram
 indexes cover artist and label names plus master and release titles; no index is
 created for large profile, contact, or notes fields. Reverse relationship keys
-and release date, country, master, and master-membership filters have dedicated
-indexes. PostgreSQL installations must make the bundled `pg_trgm` extension
-available to the migration owner. After a bulk import, run `ANALYZE` before
-serving traffic so the planner sees the imported data distribution.
+and release date, country, master, master-membership, and combined
+country/master/date filters have dedicated indexes. Exact Label/catalog-number
+and identifier type/value Release lookups use dedicated cursor-compatible
+indexes; identifier queries recheck the original value after their bounded hash
+lookup. PostgreSQL installations
+must make the bundled `pg_trgm` extension
+available to the migration owner. Canonical batch finalization analyzes newly
+bootstrapped tables before serving traffic so the planner sees the imported data
+distribution.
+V023 builds the two exact-lookup indexes over existing relation rows. Apply it
+only while Go and Java importers are stopped and reserve maintenance I/O, WAL,
+and temporary disk headroom appropriate to the populated tables. API reads may
+continue, but the new exact lookup routes must not be deployed until V023 has
+completed. The migration changes no relation identity or import contract
+revision.
 The reproducible synthetic before/after results and their full-dump limitations
 are recorded in
 [`docs/performance/2026-08-11-api-query-indexes.md`](docs/performance/2026-08-11-api-query-indexes.md).
@@ -145,6 +161,63 @@ validates existing data before adding these constraints; it does not silently
 repair conflicts. Creating the supporting unique indexes on a populated
 production database requires a measured maintenance window and sufficient
 temporary disk capacity.
+
+Release credited-artist, format, identifier, image, track, video, and work relations
+store the SHA-256 identity defined by
+[`release-relation-identity-v1`](schema/contracts/release-relation-identity-v1.md).
+V010-V016 deliberately add nullable, unindexed digest columns with unvalidated
+checks: PostgreSQL enforces the checks for new writes without rewriting or
+scanning existing relation tables. Each relation has its own migration with a
+five-second lock timeout so a busy production database rolls back instead of
+holding locks across unrelated relation tables. Revision 3 importers transactionally
+replace legacy null identities as each release root is processed. This bounded,
+resumable phase keeps the existing 32-bit key as a deterministic compatibility
+slot; it does not claim that the online index transition is complete.
+Monthly public dumps contain no release images, so dump importers do not
+backfill `release_item_image`; a future image source requires its own policy and
+import boundary. Digest-index cutover for that table remains blocked until a
+bounded maintenance job backfills surviving `file_name` rows; rows already lost
+to a legacy 32-bit collision cannot be reconstructed from the database alone.
+
+Artist name variations, artist URLs, label URLs, and master videos store the
+SHA-256 identity defined by
+[`non-release-relation-identity-v1`](schema/contracts/non-release-relation-identity-v1.md).
+V021 follows the same online transition as release relations: nullable,
+unindexed digests with unvalidated length checks preserve legacy rows and the
+existing `unique (owner, hash)` targets. Revision 2 Artist, Label, and Master
+importers reconcile each owner transactionally and allocate deterministic
+compatibility slots when distinct payloads share a legacy signed 32-bit hash.
+The migration neither scans nor rewrites the relation tables.
+
+Discogs format quantity can exceed a signed 32-bit integer. V011 preserves the
+canonical decimal value in `release_item_format.quantity_text`; the existing
+`quantity` column remains populated only when the value fits for compatibility.
+Legacy rows remain valid and are filled as their release roots are reconciled.
+
+V017 removes the redundant `created_at` column from catalog relations without
+rewriting relation rows. Relations retain `last_modified_at` as the source
+observation time of the most recent canonical payload mutation; unchanged
+refreshes do not advance it. Root entity creation and mutation timestamps are
+unchanged.
+
+V018 adds durable per-entity catalog state. A database without a successful
+checkpoint begins in `bootstrap_pending`; starting an import records whether it
+is a `bootstrap` or `refresh`, and only successful post-load finalization may
+move the entity to `ready`. `discogs_catalog_readiness.ready` is true only when
+Artist, Label, Master, and Release are all ready. Existing databases adopt only
+entities backed by a successful canonical import checkpoint; unknown or partial
+legacy state remains unavailable until a verified import completes.
+
+V019 removes relation-table surrogate IDs and their primary-key indexes.
+Canonical natural unique keys identify relation rows; root resource IDs remain
+unchanged. Consumers must not depend on relation row IDs or physical row order.
+
+V020 defines the canonical foreign-key inventory eligible for initial bulk-load
+deferral. Batch importers drop only those constraints for entities whose durable
+operation is `bootstrap`; refresh imports keep every foreign key active. A
+successful bootstrap recreates missing keys as `NOT VALID`, validates each key,
+and analyzes the affected tables before setting catalog state to `ready`.
+Constraint creation, validation, or analysis failure leaves readiness false.
 
 ## Development
 
