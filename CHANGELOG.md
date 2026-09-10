@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/dsub-io/open-discogs-model/compare/v0.4.0...v0.4.1) (2026-09-03)
+
+
+### Bug Fixes
+
+* accept CRLF in diff validation ([#68](https://github.com/dsub-io/open-discogs-model/issues/68)) ([5e70829](https://github.com/dsub-io/open-discogs-model/commit/5e708292e1a0a651ebbec9eed4e3905a8b2cdab9))
+
 ## [0.4.0](https://github.com/dsub-io/open-discogs-model/compare/v0.3.2...v0.4.0) (2026-08-14)
 
 
