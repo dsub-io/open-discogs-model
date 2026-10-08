@@ -10,27 +10,6 @@ Discogs.
 
 Every release publishes one shared semantic version for both language models.
 
-### Java and jOOQ
-
-The Java artifact is published to Maven Central and exports jOOQ as an API
-dependency.
-
-<!-- x-release-please-start-version -->
-```groovy
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'io.dsub.opendiscogs:open-discogs-model-jooq:0.4.1'
-}
-```
-<!-- x-release-please-end -->
-
-Generated table and record types remain under
-`io.dsub.opendiscogs.jooq` so existing Java source does not need package import
-changes.
-
 ### Go
 
 The Go model is published by the same Git tag as the Maven artifact.
@@ -55,6 +34,27 @@ import "github.com/dsub-io/open-discogs-model/schema"
 
 migrations, err := schema.Migrations()
 ```
+
+### Java and jOOQ
+
+The Java artifact is published to Maven Central and exports jOOQ as an API
+dependency.
+
+<!-- x-release-please-start-version -->
+```groovy
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.dsub.opendiscogs:open-discogs-model-jooq:0.4.1'
+}
+```
+<!-- x-release-please-end -->
+
+Generated table and record types remain under
+`io.dsub.opendiscogs.jooq` so existing Java source does not need package import
+changes.
 
 ## Schema ownership
 
@@ -219,6 +219,9 @@ successful bootstrap recreates missing keys as `NOT VALID`, validates each key,
 and analyzes the affected tables before setting catalog state to `ready`.
 Constraint creation, validation, or analysis failure leaves readiness false.
 
+For new deployments, use the Go Batch and API consumers listed below.
+The model remains shared by both languages.
+
 ## Development
 
 The complete local verification requires Docker, Go 1.26, and Temurin 21.
@@ -236,6 +239,8 @@ fails if the committed generated source is stale. Gradle applies the same
 migrations to an ephemeral PostgreSQL database before running jOOQ code
 generation.
 
+See [CI and contributions](docs/ci.md) for when full verification runs.
+
 ## Publishing
 
 Conventional commits merged into `main` are collected by Release Please.
@@ -252,9 +257,9 @@ material are read only from encrypted GitHub Actions secrets.
 
 ## Consumers
 
-- [OpenDiscogs Batch](https://github.com/dsub-io/open-discogs-batch)
 - [Go OpenDiscogs Batch](https://github.com/dsub-io/go-open-discogs-batch)
 - [Go OpenDiscogs API](https://github.com/dsub-io/go-open-discogs-api)
+- [Java OpenDiscogs Batch](https://github.com/dsub-io/open-discogs-batch), for existing Java deployments
 
 ## License
 
