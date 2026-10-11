@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.0.0](https://github.com/dsub-io/open-discogs-model/compare/v0.4.1...v1.0.0) (2026-10-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* retire Java source, jOOQ generation, and Maven publication. Preserve Go package APIs, SQL migrations, and legacy database adoption contracts.
+
+### Features
+
+* make Go the maintained model implementation ([63d5f27](https://github.com/dsub-io/open-discogs-model/commit/63d5f2713526350b669dcd80e0addb5147d8162f))
+
+
+### Bug Fixes
+
+* **ci:** keep metadata edits out of the required CI suite ([d9865aa](https://github.com/dsub-io/open-discogs-model/commit/d9865aa487bdd331aeb9706cb7c08df70a3a24b0))
+* **deps:** use patched Go toolchain for model builds ([0ab80c3](https://github.com/dsub-io/open-discogs-model/commit/0ab80c3f15dcbc865604f0f27831a40187eb59b7))
+* **deps:** use patched Go toolchain for model builds ([65d9d0f](https://github.com/dsub-io/open-discogs-model/commit/65d9d0ff0d14be09d325ba6d11754cfb109bf33b))
+
 ## [0.4.1](https://github.com/dsub-io/open-discogs-model/compare/v0.4.0...v0.4.1) (2026-09-03)
 
 

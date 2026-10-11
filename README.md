@@ -14,7 +14,7 @@ See the [v1 migration guide](docs/migration-to-v1.md) before upgrading.
 
 <!-- x-release-please-start-version -->
 ```bash
-go get github.com/dsub-io/open-discogs-model@v0.4.1
+go get github.com/dsub-io/open-discogs-model@v1.0.0
 ```
 <!-- x-release-please-end -->
 
