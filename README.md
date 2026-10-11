@@ -224,7 +224,7 @@ The model remains shared by both languages.
 
 ## Development
 
-The complete local verification requires Docker, Go 1.26, and Temurin 21.
+The complete local verification requires Docker, Go 1.27.2, and Temurin 21.
 
 ```bash
 sdk env
@@ -259,7 +259,7 @@ material are read only from encrypted GitHub Actions secrets.
 
 - [Go OpenDiscogs Batch](https://github.com/dsub-io/go-open-discogs-batch)
 - [Go OpenDiscogs API](https://github.com/dsub-io/go-open-discogs-api)
-- [Java OpenDiscogs Batch](https://github.com/dsub-io/open-discogs-batch), for existing Java deployments
+- [Java OpenDiscogs Batch](https://github.com/dsub-io/open-discogs-batch), archived; existing deployments can use its [Go migration guide](https://github.com/dsub-io/open-discogs-batch/blob/main/docs/migration-to-go.md)
 
 ## License
 
