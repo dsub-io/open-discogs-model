@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.0.0](https://github.com/dsub-io/open-discogs-model/compare/v0.4.1...v1.0.0) (2026-10-11)
+
+### Breaking changes
+
+Java source, jOOQ generation, Gradle tooling, and Maven Central publication have
+been retired. Version 1.0.0 publishes the Go model, embedded SQL migrations, and
+import contracts. See the [v1 migration guide](docs/migration-to-v1.md).
+
+Go package APIs, generated structs, V001-V023 SQL bytes, and legacy database
+adoption contracts are unchanged. Existing Go imports keep the same module path.
+
+### Toolchain and verification
+
+Go builds require Go 1.27.2, including its standard-library security fixes.
+CI and release publication retain PostgreSQL generation and convergence checks
+and verify the tagged Go module.
+
+PR title and body edits now leave the required source verification intact.
+Changing a PR base within the repository starts full verification of its branch.
+
 ## [0.4.1](https://github.com/dsub-io/open-discogs-model/compare/v0.4.0...v0.4.1) (2026-09-03)
 
 
