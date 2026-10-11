@@ -42,3 +42,10 @@ The Linux CI helper pins version 1.7.12 and verifies its archive checksum.
 Use [Conventional Commits](https://www.conventionalcommits.org/) for PR titles
 and commit subjects. Use `docs:` for documentation and `ci:` for workflow
 changes; release behavior is configured separately by each repository.
+
+## Model release checks
+
+CI regenerates the Go model from the canonical PostgreSQL schema, tests the
+Go packages, and checks release convergence on PostgreSQL 15 and 18. Releases
+repeat those checks at the release commit and download the tagged Go module.
+Java, jOOQ, Gradle, and Maven publication are no longer part of CI from v1.0.0.

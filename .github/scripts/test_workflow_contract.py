@@ -47,11 +47,15 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertNotIn("outputs.heavy", contribution)
         self.assertNotRegex(contribution, r"setup-go|setup-java|setup-gradle|go test|gradlew")
 
-    def test_model_checks_keep_their_toolchains(self):
+    def test_model_checks_preserve_go_and_schema_verification(self):
         if not (ROOT / "schema/contracts").is_dir():
             return
-        for toolchain in ("actions/setup-go@", "actions/setup-java@", "gradle/actions/setup-gradle@"):
-            self.assertIn(toolchain, self.ci)
+        for workflow in (self.ci, (WORKFLOWS / "release.yml").read_text()):
+            self.assertIn("actions/setup-go@", workflow)
+            self.assertIn("scripts/verify-generated-models.sh", workflow)
+            self.assertIn("scripts/test-release-convergence-contract.sh", workflow)
+            self.assertIn("go test ./...", workflow)
+            self.assertNotRegex(workflow, r"setup-java|setup-gradle|gradlew|CENTRAL_TOKEN")
 
 
 if __name__ == "__main__":
