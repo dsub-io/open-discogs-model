@@ -148,45 +148,10 @@ jobs:
             exit 1
           fi
 
-      - name: Check required secrets
-        shell: bash
-        env:
-          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
-          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        run: |
-          set -euo pipefail
-          missing=0
-          for name in CENTRAL_TOKEN_USERNAME CENTRAL_TOKEN_PASSWORD GPG_PRIVATE_KEY; do
-            if [[ -z "${!name:-}" ]]; then
-              echo "::error::Missing GitHub Actions secret: $name"
-              missing=1
-            fi
-          done
-          exit "$missing"
-
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
-          cache: true
-
-      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
-        with:
-          java-version: '21'
-          distribution: temurin
-
-      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
-
-      - name: Import release signing key
-        shell: bash
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        run: |
-          set -euo pipefail
-          export GNUPGHOME="$RUNNER_TEMP/gnupg"
-          install -d -m 700 "$GNUPGHOME"
-          printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
-          echo "GNUPGHOME=$GNUPGHOME" >> "$GITHUB_ENV"
+          cache: false
 
       - name: Verify Go module
         run: |
@@ -197,122 +162,14 @@ jobs:
       - name: Verify release convergence on supported PostgreSQL versions
         run: scripts/test-release-convergence-contract.sh
 
-      - name: Build Maven Central artifacts
-        shell: bash
-        env:
-          RELEASE_VERSION: ${{ needs.release-please.outputs.version }}
-        run: |
-          set -euo pipefail
-          ./gradlew clean build publishMavenJavaPublicationToCentralStagingRepository \
-            -PreleaseVersion="$RELEASE_VERSION" \
-            --no-daemon \
-            --warning-mode=fail
-
-      - name: Verify packaged schema resource inventory
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          mapfile -t model_jars < <(
-            find build/libs -maxdepth 1 -type f -name '*.jar' \
-              ! -name '*-sources.jar' \
-              ! -name '*-javadoc.jar' \
-              -print
-          )
-          if (( ${#model_jars[@]} != 1 )); then
-            echo "::error::Expected exactly one model JAR, found ${#model_jars[@]}."
-            exit 1
-          fi
-
-          model_jar="${model_jars[0]}"
-          expected_inventory="$(mktemp)"
-          actual_inventory="$(mktemp)"
-          expected_index="$(mktemp)"
-          trap 'rm -f "$expected_inventory" "$actual_inventory" "$expected_index"' EXIT
-
-          find schema/migrations -maxdepth 1 -type f -name 'V*.sql' \
-            -printf '%f\n' | LC_ALL=C sort > "$expected_index"
-          if [[ ! -s "$expected_index" ]]; then
-            echo '::error::Canonical migration inventory is empty.'
-            exit 1
-          fi
-
-          {
-            echo postgresql-init.sql
-            echo migrations/index.txt
-            echo io/dsub/opendiscogs/schema/migrations/index.txt
-            while IFS= read -r migration_name; do
-              echo "migrations/$migration_name"
-              echo "io/dsub/opendiscogs/schema/migrations/$migration_name"
-            done < "$expected_index"
-            find schema/contracts -type f -printf '%P\n' | LC_ALL=C sort |
-              while IFS= read -r contract_name; do
-                echo "contracts/$contract_name"
-                echo "io/dsub/opendiscogs/schema/contracts/$contract_name"
-              done
-          } | LC_ALL=C sort > "$expected_inventory"
-
-          jar --list --file "$model_jar" |
-            awk '
-              $0 == "postgresql-init.sql" ||
-              $0 == "migrations/index.txt" ||
-              $0 == "io/dsub/opendiscogs/schema/migrations/index.txt" ||
-              $0 ~ /^migrations\/V[0-9][0-9][0-9]__[a-z0-9_]+\.sql$/ ||
-              $0 ~ /^io\/dsub\/opendiscogs\/schema\/migrations\/V[0-9][0-9][0-9]__[a-z0-9_]+\.sql$/ ||
-              $0 ~ /^contracts\/[^/].*$/ ||
-              $0 ~ /^io\/dsub\/opendiscogs\/schema\/contracts\/[^/].*$/
-            ' | LC_ALL=C sort > "$actual_inventory"
-          diff --unified "$expected_inventory" "$actual_inventory"
-
-          unzip -p "$model_jar" migrations/index.txt | cmp - "$expected_index"
-          unzip -p "$model_jar" \
-            io/dsub/opendiscogs/schema/migrations/index.txt |
-            cmp - "$expected_index"
-
-          while IFS= read -r migration_name; do
-            unzip -p "$model_jar" "migrations/$migration_name" |
-              cmp - "schema/migrations/$migration_name"
-            unzip -p "$model_jar" \
-              "io/dsub/opendiscogs/schema/migrations/$migration_name" |
-              cmp - "schema/migrations/$migration_name"
-          done < "$expected_index"
-
-          while IFS= read -r contract_path; do
-            unzip -p "$model_jar" "contracts/$contract_path" |
-              cmp - "schema/contracts/$contract_path"
-            unzip -p "$model_jar" \
-              "io/dsub/opendiscogs/schema/contracts/$contract_path" |
-              cmp - "schema/contracts/$contract_path"
-          done < <(find schema/contracts -type f -printf '%P\n' | LC_ALL=C sort)
-
-      - name: Sign and package Maven Central bundle
-        id: bundle
-        shell: bash
-        env:
-          GPG_PRIVATE_KEY_PASSWORD: ${{ secrets.GPG_PRIVATE_KEY_PASSWORD }}
-          RELEASE_VERSION: ${{ needs.release-please.outputs.version }}
-        run: |
-          set -euo pipefail
-          bundle_path="$(scripts/prepare-central-bundle.sh "$RELEASE_VERSION")"
-          echo "path=$bundle_path" >> "$GITHUB_OUTPUT"
-
-      - name: Upload and publish through Maven Central
-        shell: bash
-        env:
-          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
-          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
-          RELEASE_VERSION: ${{ needs.release-please.outputs.version }}
-        run: |
-          set -euo pipefail
-          scripts/publish-central-bundle.sh \
-            "${{ steps.bundle.outputs.path }}" \
-            "io.dsub.opendiscogs:open-discogs-model-jooq:$RELEASE_VERSION"
-
       - name: Verify tagged Go module
         shell: bash
         env:
           RELEASE_TAG: ${{ needs.release-please.outputs.tag-name }}
         run: |
           set -euo pipefail
-          GOPROXY=direct go list -m \
-            "github.com/dsub-io/open-discogs-model@$RELEASE_TAG"
+          module_json="$(GOPROXY=direct go mod download -json \
+            "github.com/dsub-io/open-discogs-model@$RELEASE_TAG")"
+          jq -e --arg tag "$RELEASE_TAG" \
+            '.Path == "github.com/dsub-io/open-discogs-model" and .Version == $tag and .Error == null' \
+            <<< "$module_json" >/dev/null

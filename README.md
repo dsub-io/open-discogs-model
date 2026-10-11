@@ -1,18 +1,16 @@
 # OpenDiscogs Model
 
-Canonical PostgreSQL schema and generated Java and Go models shared by DSUB
-OpenDiscogs services.
+Canonical PostgreSQL schema and generated Go models for the OpenDiscogs API
+and Batch.
 
 This is an independent DSUB project. It is not affiliated with or endorsed by
 Discogs.
 
-## Packages
+## Go module
 
-Every release publishes one shared semantic version for both language models.
-
-### Go
-
-The Go model is published by the same Git tag as the Maven artifact.
+From v1.0.0, releases contain the Go model, embedded SQL migrations, and import
+contracts. Java source, jOOQ generation, and Maven publication have been retired.
+See the [v1 migration guide](docs/migration-to-v1.md) before upgrading.
 
 <!-- x-release-please-start-version -->
 ```bash
@@ -35,37 +33,12 @@ import "github.com/dsub-io/open-discogs-model/schema"
 migrations, err := schema.Migrations()
 ```
 
-### Java and jOOQ
-
-The Java artifact is published to Maven Central and exports jOOQ as an API
-dependency.
-
-<!-- x-release-please-start-version -->
-```groovy
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'io.dsub.opendiscogs:open-discogs-model-jooq:0.4.1'
-}
-```
-<!-- x-release-please-end -->
-
-Generated table and record types remain under
-`io.dsub.opendiscogs.jooq` so existing Java source does not need package import
-changes.
-
 ## Schema ownership
 
 Files under `schema/migrations` are the only hand-maintained database schema
-source. The Java jOOQ classes and Go structs are generated from a PostgreSQL
-database created from those ordered migrations.
-The Java artifact contains a generated migration inventory and byte-identical
-SQL under `io/dsub/opendiscogs/schema/migrations`. JVM consumers use that
-namespaced inventory instead of maintaining consumer-owned migration copies.
-The legacy `migrations` resource path remains packaged only for compatibility
-with released Liquibase consumers.
+source. Go structs are generated from a PostgreSQL database created from those
+ordered migrations. The `schema` package embeds the original SQL and contract
+resources in the Go module.
 
 Canonical migrations require PostgreSQL 15 or newer. Consumers calculate
 checksums from the original packaged SQL bytes and only then scope canonical
@@ -92,7 +65,8 @@ The schema includes the OpenDiscogs catalog tables, immutable dump provenance,
 append-only import-run identity, and bounded progress that becomes historical
 when a run completes. The shared
 [`import-manifest-v1`](schema/contracts/import-manifest-v1.md) contract gives
-Java and Go the same content fingerprint and skip/force semantics.
+Go consumers the same content fingerprint and skip/force semantics, with
+compatibility for historical Java imports.
 The [`import-progress-v1`](schema/contracts/import-progress-v1.md) contract
 keeps one summary row per selected entity and a resumable chunk ledger. The
 ledger supports parallel commits without treating gaps as completed work and
@@ -219,25 +193,23 @@ successful bootstrap recreates missing keys as `NOT VALID`, validates each key,
 and analyzes the affected tables before setting catalog state to `ready`.
 Constraint creation, validation, or analysis failure leaves readiness false.
 
-For new deployments, use the Go Batch and API consumers listed below.
-The model remains shared by both languages.
+Use the Go Batch and API consumers listed below for new deployments. The Java
+applications are deprecated and their repositories are archived.
 
 ## Development
 
-The complete local verification requires Docker, Go 1.27.2, and Temurin 21.
+The complete local verification requires Docker and Go 1.27.2.
 
 ```bash
-sdk env
 scripts/verify-generated-models.sh
 go test ./...
-./gradlew clean build --no-daemon --warning-mode=fail
+scripts/test-release-convergence-contract.sh
 ```
 
 `scripts/verify-generated-models.sh` applies every migration to a temporary
 PostgreSQL 18 container, regenerates the Go model from the live catalog, and
-fails if the committed generated source is stale. Gradle applies the same
-migrations to an ephemeral PostgreSQL database before running jOOQ code
-generation.
+fails if the committed generated source is stale. The convergence checks run
+on PostgreSQL 15 and 18.
 
 See [CI and contributions](docs/ci.md) for when full verification runs.
 
@@ -247,18 +219,19 @@ Conventional commits merged into `main` are collected by Release Please.
 Merging its release pull request creates a single semantic-version tag and
 GitHub Release. The release workflow then:
 
-1. regenerates and tests the Go module;
-2. builds and tests the Java package;
-3. signs and publishes `open-discogs-model-jooq` through Maven Central; and
-4. verifies the tagged Go module directly from GitHub.
+1. applies the SQL migrations and checks generated Go models;
+2. tests Go packages and PostgreSQL release convergence; and
+3. downloads the tagged Go module directly from GitHub and verifies its version.
 
-Documentation-only changes do not create a version bump. Credentials and GPG
-material are read only from encrypted GitHub Actions secrets.
+Documentation-only changes do not create a version bump. Release PR commits
+are signed using encrypted GitHub Actions secrets. Publishing the Go module
+requires no Maven Central credentials.
 
 ## Consumers
 
 - [Go OpenDiscogs Batch](https://github.com/dsub-io/go-open-discogs-batch)
 - [Go OpenDiscogs API](https://github.com/dsub-io/go-open-discogs-api)
+- [Java OpenDiscogs API](https://github.com/dsub-io/open-discogs-api), archived; existing deployments can use its [Go migration guide](https://github.com/dsub-io/open-discogs-api/blob/main/docs/migration-to-go.md)
 - [Java OpenDiscogs Batch](https://github.com/dsub-io/open-discogs-batch), archived; existing deployments can use its [Go migration guide](https://github.com/dsub-io/open-discogs-batch/blob/main/docs/migration-to-go.md)
 
 ## License

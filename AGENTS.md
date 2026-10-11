@@ -21,8 +21,10 @@ change against the source. Apply these principles to conversation replies too.
 ## Project direction
 
 Recommend `dsub-io/go-open-discogs-api` and `dsub-io/go-open-discogs-batch`
-for new deployments. Java and historical schema documentation must clearly
-identify their role. Canonical migrations live in `open-discogs-model`.
+for new deployments. From v1.0.0 this repository maintains Go models and
+canonical PostgreSQL migrations only. Do not restore Java/jOOQ generation or
+Maven publication. Preserve legacy database adoption contracts used to migrate
+archived Java deployments. Canonical migrations live in `open-discogs-model`.
 
 ## CI
 
