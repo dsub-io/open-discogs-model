@@ -3,7 +3,7 @@
 Canonical PostgreSQL schema and generated Go models for the OpenDiscogs API
 and Batch.
 
-This is an independent DSUB project. It is not affiliated with or endorsed by
+This is an independent echovisionlab project. It is not affiliated with or endorsed by
 Discogs.
 
 ## Go module
@@ -12,23 +12,27 @@ From v1.0.0, releases contain the Go model, embedded SQL migrations, and import
 contracts. Java source, jOOQ generation, and Maven publication have been retired.
 See the [v1 migration guide](docs/migration-to-v1.md) before upgrading.
 
+TODO: Tag a model release with the new module path, then update the version
+below. The retained v1.0.0 predates the path change. See the
+[release order](docs/ci.md#organization-migration-release-order).
+
 <!-- x-release-please-start-version -->
 ```bash
-go get github.com/dsub-io/open-discogs-model@v1.0.0
+go get github.com/echovisionlab/open-discogs-model@v1.0.0
 ```
 <!-- x-release-please-end -->
 
 Applications import generated database structs from:
 
 ```go
-import "github.com/dsub-io/open-discogs-model/model"
+import "github.com/echovisionlab/open-discogs-model/model"
 ```
 
 Canonical SQL migrations can be read from the `schema` package without giving
 the model module ownership of when an application migrates its database:
 
 ```go
-import "github.com/dsub-io/open-discogs-model/schema"
+import "github.com/echovisionlab/open-discogs-model/schema"
 
 migrations, err := schema.Migrations()
 ```
@@ -229,10 +233,10 @@ requires no Maven Central credentials.
 
 ## Consumers
 
-- [Go OpenDiscogs Batch](https://github.com/dsub-io/go-open-discogs-batch)
-- [Go OpenDiscogs API](https://github.com/dsub-io/go-open-discogs-api)
-- [Java OpenDiscogs API](https://github.com/dsub-io/open-discogs-api), archived; existing deployments can use its [Go migration guide](https://github.com/dsub-io/open-discogs-api/blob/main/docs/migration-to-go.md)
-- [Java OpenDiscogs Batch](https://github.com/dsub-io/open-discogs-batch), archived; existing deployments can use its [Go migration guide](https://github.com/dsub-io/open-discogs-batch/blob/main/docs/migration-to-go.md)
+- [Go OpenDiscogs Batch](https://github.com/echovisionlab/go-open-discogs-batch)
+- [Go OpenDiscogs API](https://github.com/echovisionlab/go-open-discogs-api)
+- [Java OpenDiscogs API](https://github.com/echovisionlab/open-discogs-api), archived; existing deployments can use its [Go migration guide](https://github.com/echovisionlab/open-discogs-api/blob/main/docs/migration-to-go.md)
+- [Java OpenDiscogs Batch](https://github.com/echovisionlab/open-discogs-batch), archived; existing deployments can use its [Go migration guide](https://github.com/echovisionlab/open-discogs-batch/blob/main/docs/migration-to-go.md)
 
 ## License
 

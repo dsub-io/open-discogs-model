@@ -23,11 +23,11 @@ cleanup() {
       continue
     fi
     actual_owner="$(docker container inspect \
-      --format '{{index .Config.Labels "io.dsub.test-owner"}}' "$container_name")"
+      --format '{{index .Config.Labels "io.echovisionlab.test-owner"}}' "$container_name")"
     actual_suite="$(docker container inspect \
-      --format '{{index .Config.Labels "io.dsub.test-suite"}}' "$container_name")"
+      --format '{{index .Config.Labels "io.echovisionlab.test-suite"}}' "$container_name")"
     actual_run="$(docker container inspect \
-      --format '{{index .Config.Labels "io.dsub.test-run"}}' "$container_name")"
+      --format '{{index .Config.Labels "io.echovisionlab.test-run"}}' "$container_name")"
     if [[ "$actual_owner" != "$test_owner" \
       || "$actual_suite" != "$test_suite" \
       || "$actual_run" != "$test_run" ]]; then
@@ -47,9 +47,9 @@ cleanup() {
   done
 
   resource_ids="$(docker container ls --all --quiet \
-    --filter "label=io.dsub.test-owner=$test_owner" \
-    --filter "label=io.dsub.test-suite=$test_suite" \
-    --filter "label=io.dsub.test-run=$test_run")"
+    --filter "label=io.echovisionlab.test-owner=$test_owner" \
+    --filter "label=io.echovisionlab.test-suite=$test_suite" \
+    --filter "label=io.echovisionlab.test-run=$test_run")"
   if [[ -n "$resource_ids" ]]; then
     printf 'Docker container residue remains for test run %s: %s\n' \
       "$test_run" "$resource_ids" >&2
@@ -58,9 +58,9 @@ cleanup() {
 
   for resource_type in network volume; do
     resource_ids="$(docker "$resource_type" ls --quiet \
-      --filter "label=io.dsub.test-owner=$test_owner" \
-      --filter "label=io.dsub.test-suite=$test_suite" \
-      --filter "label=io.dsub.test-run=$test_run")"
+      --filter "label=io.echovisionlab.test-owner=$test_owner" \
+      --filter "label=io.echovisionlab.test-suite=$test_suite" \
+      --filter "label=io.echovisionlab.test-run=$test_run")"
     if [[ -n "$resource_ids" ]]; then
       printf 'Docker %s residue remains for test run %s: %s\n' \
         "$resource_type" "$test_run" "$resource_ids" >&2
@@ -804,9 +804,9 @@ run_postgres_contract_test() {
   docker run \
     --detach \
     --name "$container_name" \
-    --label "io.dsub.test-owner=$test_owner" \
-    --label "io.dsub.test-suite=$test_suite" \
-    --label "io.dsub.test-run=$test_run" \
+    --label "io.echovisionlab.test-owner=$test_owner" \
+    --label "io.echovisionlab.test-suite=$test_suite" \
+    --label "io.echovisionlab.test-run=$test_run" \
     --tmpfs "$tmpfs_path:rw,noexec,nosuid,size=512m" \
     --env "PGDATA=$pgdata_path" \
     --env POSTGRES_PASSWORD=contracttest \

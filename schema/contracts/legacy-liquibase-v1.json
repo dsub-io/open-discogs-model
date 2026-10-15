@@ -3,7 +3,7 @@
   "contract": "open-discogs-legacy-liquibase/v1",
   "schemaDefinition": {
     "name": "legacy-liquibase-v1.schema.json",
-    "sha256": "33df80a1c3832dc71d8c5c43eabbd17f90ec12f949a8e83dc130fe7e342b5bf6"
+    "sha256": "4872fc743f3810d5e80b1a3f3e89a2e6cc6fc1d2b2f70b3c2745a26a261dff0e"
   },
   "liquibaseVersion": "5.0.3",
   "liquibaseChecksumVersion": 9,

@@ -32,7 +32,7 @@ fi
 docker run \
   --detach \
   --name "$container_name" \
-  --label io.dsub.test-owner=open-discogs-model \
+  --label io.echovisionlab.test-owner=open-discogs-model \
   --tmpfs /var/lib/postgresql:rw,noexec,nosuid,size=512m \
   --env POSTGRES_DB=migrationtest \
   --env POSTGRES_PASSWORD=migrationtest \
