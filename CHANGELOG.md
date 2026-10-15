@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.0](https://github.com/dsub-io/open-discogs-model/compare/v0.4.1...v1.0.0) (2026-10-11)
+## [1.0.0](https://github.com/echovisionlab/open-discogs-model/compare/v0.4.1...v1.0.0) (2026-10-11)
 
 ### Breaking changes
 
@@ -20,33 +20,33 @@ and verify the tagged Go module.
 PR title and body edits now leave the required source verification intact.
 Changing a PR base within the repository starts full verification of its branch.
 
-## [0.4.1](https://github.com/dsub-io/open-discogs-model/compare/v0.4.0...v0.4.1) (2026-09-03)
+## [0.4.1](https://github.com/echovisionlab/open-discogs-model/compare/v0.4.0...v0.4.1) (2026-09-03)
 
 
 ### Bug Fixes
 
-* accept CRLF in diff validation ([#68](https://github.com/dsub-io/open-discogs-model/issues/68)) ([5e70829](https://github.com/dsub-io/open-discogs-model/commit/5e708292e1a0a651ebbec9eed4e3905a8b2cdab9))
+* accept CRLF in diff validation ([#68](https://github.com/echovisionlab/open-discogs-model/issues/68)) ([5e70829](https://github.com/echovisionlab/open-discogs-model/commit/5e708292e1a0a651ebbec9eed4e3905a8b2cdab9))
 
-## [0.4.0](https://github.com/dsub-io/open-discogs-model/compare/v0.3.2...v0.4.0) (2026-08-14)
+## [0.4.0](https://github.com/echovisionlab/open-discogs-model/compare/v0.3.2...v0.4.0) (2026-08-14)
 
 
 ### Features
 
-* add exact release lookup indexes ([#63](https://github.com/dsub-io/open-discogs-model/issues/63)) ([d569f58](https://github.com/dsub-io/open-discogs-model/commit/d569f58a44560ecf45e2f3a2f20de7e69613a7ca))
+* add exact release lookup indexes ([#63](https://github.com/echovisionlab/open-discogs-model/issues/63)) ([d569f58](https://github.com/echovisionlab/open-discogs-model/commit/d569f58a44560ecf45e2f3a2f20de7e69613a7ca))
 
-## [0.3.2](https://github.com/dsub-io/open-discogs-model/compare/v0.3.1...v0.3.2) (2026-08-13)
+## [0.3.2](https://github.com/echovisionlab/open-discogs-model/compare/v0.3.1...v0.3.2) (2026-08-13)
 
 
 ### Performance Improvements
 
-* optimize combined release filters ([51cc7b3](https://github.com/dsub-io/open-discogs-model/commit/51cc7b3822000ae1b7ef70cb676933be5d1bda41))
+* optimize combined release filters ([51cc7b3](https://github.com/echovisionlab/open-discogs-model/commit/51cc7b3822000ae1b7ef70cb676933be5d1bda41))
 
-## [0.3.1](https://github.com/dsub-io/open-discogs-model/compare/v0.3.0...v0.3.1) (2026-08-13)
+## [0.3.1](https://github.com/echovisionlab/open-discogs-model/compare/v0.3.0...v0.3.1) (2026-08-13)
 
 
 ### Bug Fixes
 
-* preserve canonical relation identities and import state ([#57](https://github.com/dsub-io/open-discogs-model/issues/57)) ([3d4b66e](https://github.com/dsub-io/open-discogs-model/commit/3d4b66e4f5394965986afc96a49b246888ed630a))
+* preserve canonical relation identities and import state ([#57](https://github.com/echovisionlab/open-discogs-model/issues/57)) ([3d4b66e](https://github.com/echovisionlab/open-discogs-model/commit/3d4b66e4f5394965986afc96a49b246888ed630a))
   * preserve distinct release format quantities, label catalog numbers, and
     relation payloads that share a legacy 32-bit hash
   * make PostgreSQL natural keys, Go dedupe, Java dedupe, and stale
@@ -75,12 +75,12 @@ Changing a PR base within the repository starts full verification of its branch.
 * deferred foreign keys are restored and validated before catalog readiness;
   operators should not serve a bootstrap database until readiness is true
 
-## [0.3.0](https://github.com/dsub-io/open-discogs-model/compare/v0.2.3...v0.3.0) (2026-08-12)
+## [0.3.0](https://github.com/echovisionlab/open-discogs-model/compare/v0.2.3...v0.3.0) (2026-08-12)
 
 
 ### Features
 
-* add a canonical release-import convergence contract ([#49](https://github.com/dsub-io/open-discogs-model/pull/49))
+* add a canonical release-import convergence contract ([#49](https://github.com/echovisionlab/open-discogs-model/pull/49))
   * record an explicit import-contract revision per entity (`artist=1`,
     `label=1`, `master=1`, `release=2`) so Go and Java can distinguish
     compatible checkpoints from imports created with older release semantics
@@ -93,15 +93,15 @@ Changing a PR base within the repository starts full verification of its branch.
 ### Bug Fixes
 
 * publish a strict legacy Liquibase adoption contract for Java releases
-  `1.0.0` through `1.2.1` ([#49](https://github.com/dsub-io/open-discogs-model/pull/49))
+  `1.0.0` through `1.2.1` ([#49](https://github.com/echovisionlab/open-discogs-model/pull/49))
   * bind V001-V007 history to released changeset identities, canonical SQL
     hashes, permitted execution states, and PostgreSQL schema fingerprints
   * fail closed on partial, unknown, or catalog-mismatched histories instead of
     replaying already-applied schema changes
 * validate the published jOOQ dependency node against the declared Java API
-  version instead of a stale hardcoded version ([#51](https://github.com/dsub-io/open-discogs-model/pull/51))
+  version instead of a stale hardcoded version ([#51](https://github.com/echovisionlab/open-discogs-model/pull/51))
 * wait for the final PostgreSQL server instead of the temporary initialization
-  server in release contract tests ([#53](https://github.com/dsub-io/open-discogs-model/pull/53))
+  server in release contract tests ([#53](https://github.com/echovisionlab/open-discogs-model/pull/53))
 
 ### Verification
 
@@ -120,19 +120,19 @@ Changing a PR base within the repository starts full verification of its branch.
   have not been measured; operators should measure them on a production-sized
   copy and schedule a backed-up maintenance window before upgrading
 
-## [0.2.3](https://github.com/dsub-io/open-discogs-model/compare/v0.2.2...v0.2.3) (2026-08-12)
+## [0.2.3](https://github.com/echovisionlab/open-discogs-model/compare/v0.2.2...v0.2.3) (2026-08-12)
 
 
 ### Bug Fixes
 
-* preserve distinct catalog numbers on repeated release-label credits and verify upgrades from V007 ([#46](https://github.com/dsub-io/open-discogs-model/pull/46))
+* preserve distinct catalog numbers on repeated release-label credits and verify upgrades from V007 ([#46](https://github.com/echovisionlab/open-discogs-model/pull/46))
 
-## [0.2.2](https://github.com/dsub-io/open-discogs-model/compare/v0.2.1...v0.2.2) (2026-08-11)
+## [0.2.2](https://github.com/echovisionlab/open-discogs-model/compare/v0.2.1...v0.2.2) (2026-08-11)
 
 
 ### Performance Improvements
 
-* add indexed API query paths ([#44](https://github.com/dsub-io/open-discogs-model/issues/44)) ([85c43ad](https://github.com/dsub-io/open-discogs-model/commit/85c43ad062ed273c856cbc2ab6246f22280aef64))
+* add indexed API query paths ([#44](https://github.com/echovisionlab/open-discogs-model/issues/44)) ([85c43ad](https://github.com/echovisionlab/open-discogs-model/commit/85c43ad062ed273c856cbc2ab6246f22280aef64))
   * release-title substring p95 fell from 194.535 ms to 0.136 ms (99.930%)
     and artist-release lookup p95 fell from 17.309 ms to 0.061 ms (99.648%)
     in the reproducible 1,000,000-release synthetic benchmark
@@ -140,60 +140,60 @@ Changing a PR base within the repository starts full verification of its branch.
     full-dump storage, import duration, cold I/O, and concurrency remain
     pre-production validation gates
 
-## [0.2.1](https://github.com/dsub-io/open-discogs-model/compare/v0.2.0...v0.2.1) (2026-08-10)
+## [0.2.1](https://github.com/echovisionlab/open-discogs-model/compare/v0.2.0...v0.2.1) (2026-08-10)
 
 
 ### Bug Fixes
 
-* lock import reference dependencies ([#41](https://github.com/dsub-io/open-discogs-model/issues/41)) ([4bf7cc6](https://github.com/dsub-io/open-discogs-model/commit/4bf7cc6533da6bc05e6c945ae7876a7d12b0ec3a))
+* lock import reference dependencies ([#41](https://github.com/echovisionlab/open-discogs-model/issues/41)) ([4bf7cc6](https://github.com/echovisionlab/open-discogs-model/commit/4bf7cc6533da6bc05e6c945ae7876a7d12b0ec3a))
 
-## [0.2.0](https://github.com/dsub-io/open-discogs-model/compare/v0.1.2...v0.2.0) (2026-08-10)
+## [0.2.0](https://github.com/echovisionlab/open-discogs-model/compare/v0.1.2...v0.2.0) (2026-08-10)
 
 
 ### Features
 
-* add durable import progress ([#37](https://github.com/dsub-io/open-discogs-model/issues/37)) ([a953983](https://github.com/dsub-io/open-discogs-model/commit/a95398312e5e2898d49314c590abe89c1ca4e734))
+* add durable import progress ([#37](https://github.com/echovisionlab/open-discogs-model/issues/37)) ([a953983](https://github.com/echovisionlab/open-discogs-model/commit/a95398312e5e2898d49314c590abe89c1ca4e734))
 
 
 ### Bug Fixes
 
-* make import progress concurrency-safe ([#39](https://github.com/dsub-io/open-discogs-model/issues/39)) ([47f58cd](https://github.com/dsub-io/open-discogs-model/commit/47f58cd0099df7f0b44dd76a2de7363fa192db66))
+* make import progress concurrency-safe ([#39](https://github.com/echovisionlab/open-discogs-model/issues/39)) ([47f58cd](https://github.com/echovisionlab/open-discogs-model/commit/47f58cd0099df7f0b44dd76a2de7363fa192db66))
 
-## [0.1.2](https://github.com/dsub-io/open-discogs-model/compare/v0.1.1...v0.1.2) (2026-07-31)
-
-
-### Bug Fixes
-
-* allow independent entity dump dates ([2eea8d0](https://github.com/dsub-io/open-discogs-model/commit/2eea8d055328ea1fd25bae753df64abb6d606600))
-
-## [0.1.1](https://github.com/dsub-io/open-discogs-model/compare/v0.1.0...v0.1.1) (2026-07-31)
+## [0.1.2](https://github.com/echovisionlab/open-discogs-model/compare/v0.1.1...v0.1.2) (2026-07-31)
 
 
 ### Bug Fixes
 
-* allow reissued dump paths ([7c5eec2](https://github.com/dsub-io/open-discogs-model/commit/7c5eec210f9e2cf543684da79fbddc01b79625bc))
+* allow independent entity dump dates ([2eea8d0](https://github.com/echovisionlab/open-discogs-model/commit/2eea8d055328ea1fd25bae753df64abb6d606600))
 
-## [0.1.0](https://github.com/dsub-io/open-discogs-model/compare/v0.0.5...v0.1.0) (2026-07-31)
+## [0.1.1](https://github.com/echovisionlab/open-discogs-model/compare/v0.1.0...v0.1.1) (2026-07-31)
+
+
+### Bug Fixes
+
+* allow reissued dump paths ([7c5eec2](https://github.com/echovisionlab/open-discogs-model/commit/7c5eec210f9e2cf543684da79fbddc01b79625bc))
+
+## [0.1.0](https://github.com/echovisionlab/open-discogs-model/compare/v0.0.5...v0.1.0) (2026-07-31)
 
 
 ### Features
 
-* publish shared Java and Go models ([3c3332d](https://github.com/dsub-io/open-discogs-model/commit/3c3332db8ace2a34bb8d89e554ade421793a1b84))
+* publish shared Java and Go models ([3c3332d](https://github.com/echovisionlab/open-discogs-model/commit/3c3332db8ace2a34bb8d89e554ade421793a1b84))
 
-## [0.0.5](https://github.com/dsub-io/open-discogs-model/compare/v0.0.4...v0.0.5) (2026-07-30)
+## [0.0.5](https://github.com/echovisionlab/open-discogs-model/compare/v0.0.4...v0.0.5) (2026-07-30)
 
 
 ### Build System
 
-* housekeeping ([9fd860a](https://github.com/dsub-io/open-discogs-model/commit/9fd860a21283a0b645555a0cbe2ba5909767b109))
-* sign automated releases ([db590ba](https://github.com/dsub-io/open-discogs-model/commit/db590ba7054f1aea397f020a1b2388f377bf3a0c))
+* housekeeping ([9fd860a](https://github.com/echovisionlab/open-discogs-model/commit/9fd860a21283a0b645555a0cbe2ba5909767b109))
+* sign automated releases ([db590ba](https://github.com/echovisionlab/open-discogs-model/commit/db590ba7054f1aea397f020a1b2388f377bf3a0c))
 
 
 ### Maintenance
 
-* update repository ownership metadata ([bf02db3](https://github.com/dsub-io/open-discogs-model/commit/bf02db3ea5372786da95062d7af44b9e3fb7e950))
+* update repository ownership metadata ([bf02db3](https://github.com/echovisionlab/open-discogs-model/commit/bf02db3ea5372786da95062d7af44b9e3fb7e950))
 
 
 ### Bug Fixes
 
-* sign automated releases ([9f89b4e](https://github.com/dsub-io/open-discogs-model/commit/9f89b4ee372351a073d743e8a4e9c4434ac5b252))
+* sign automated releases ([9f89b4e](https://github.com/echovisionlab/open-discogs-model/commit/9f89b4ee372351a073d743e8a4e9c4434ac5b252))

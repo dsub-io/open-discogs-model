@@ -47,7 +47,7 @@ trap cleanup EXIT INT TERM
 docker run \
   --detach \
   --name "$container_name" \
-  --label io.dsub.test-owner=open-discogs-model \
+  --label io.echovisionlab.test-owner=open-discogs-model \
   --tmpfs /var/lib/postgresql:rw,noexec,nosuid,size=4g \
   --env POSTGRES_DB=modelbench \
   --env POSTGRES_PASSWORD=modelbench \

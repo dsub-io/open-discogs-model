@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/dsub-io/open-discogs-model/schema/contracts/legacy-liquibase-v1.schema.json",
+  "$id": "https://github.com/echovisionlab/open-discogs-model/schema/contracts/legacy-liquibase-v1.schema.json",
   "title": "OpenDiscogs legacy Liquibase compatibility manifest v1",
   "type": "object",
   "additionalProperties": false,

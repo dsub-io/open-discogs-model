@@ -169,7 +169,7 @@ jobs:
         run: |
           set -euo pipefail
           module_json="$(GOPROXY=direct go mod download -json \
-            "github.com/dsub-io/open-discogs-model@$RELEASE_TAG")"
+            "github.com/echovisionlab/open-discogs-model@$RELEASE_TAG")"
           jq -e --arg tag "$RELEASE_TAG" \
-            '.Path == "github.com/dsub-io/open-discogs-model" and .Version == $tag and .Error == null' \
+            '.Path == "github.com/echovisionlab/open-discogs-model" and .Version == $tag and .Error == null' \
             <<< "$module_json" >/dev/null
