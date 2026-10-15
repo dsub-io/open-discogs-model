@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/echovisionlab/open-discogs-model/compare/v1.0.0...v1.0.1) (2026-10-15)
+
+
+### Bug Fixes
+
+* publish the module as github.com/echovisionlab/open-discogs-model ([#78](https://github.com/echovisionlab/open-discogs-model/issues/78)) ([a4b6492](https://github.com/echovisionlab/open-discogs-model/commit/a4b64921395f4029d60519abc9c26c0c2de5d2b5))
+
 ## [1.0.0](https://github.com/echovisionlab/open-discogs-model/compare/v0.4.1...v1.0.0) (2026-10-11)
 
 ### Breaking changes
