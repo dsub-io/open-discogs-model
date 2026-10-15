@@ -18,7 +18,7 @@ below. The retained v1.0.0 predates the path change. See the
 
 <!-- x-release-please-start-version -->
 ```bash
-go get github.com/echovisionlab/open-discogs-model@v1.0.0
+go get github.com/echovisionlab/open-discogs-model@v1.0.1
 ```
 <!-- x-release-please-end -->
 
